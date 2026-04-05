@@ -66,7 +66,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
     
     // When switching to live mode, establish WebSocket connection
     if (hardwareMode === "live") {
-      socket = new WebSocket("ws://localhost:8080");
+      socket = new WebSocket("wss://aura-sit-backened.onrender.com");
       
       socket.onopen = () => {
         console.log("Connected to hardware WebSocket");
