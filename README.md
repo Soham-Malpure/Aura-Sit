@@ -1,16 +1,32 @@
-# React + Vite
+# Aura-Sit 🦴
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aura-Sit is a comprehensive, True IoT customized posture-monitoring ecosystem. By bridging custom node-based hardware with a highly responsive, analytical SaaS dashboard, the project maps real-time user mechanics to actionable health intelligence. 
 
-Currently, two official plugins are available:
+Instead of relying on a serialized usb tether, Aura-Sit employs a NodeMCU ESP8266 microcontroller streaming raw JSON distancing data via Wi-Fi securely over Websockets to a localized interface.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Core Features ⚡️
+* **Decentralized Posture Engine:** A custom-built AI ruleset (`usePostureEngine.js`) running entirely inside the user's web browser ensures zero-latency calculations and data privacy.
+* **Ergonomic Activity Index:** Actively tracks user micro-adjustments (>1.5cm shifts) to encourage dynamic "active sitting" rather than static freezing.
+* **Time-to-Fatigue Profiling:** Intelligently times the specific endurance of a user, predicting exactly when their muscles typically fatigue and degrade into postural compression.
+* **Biomechanical Risk Mapping:** Translates abstract numeric thresholds into exact anatomical risk factors (e.g., *Cervical Spine Strain* vs *Lumbar Compression*).
+* **True IoT Architecture:** Enforces Device Pairing signatures (e.g. `AURA-X792`), preventing data overlap in multi-user environments.
 
-## React Compiler
+## How to Run Locally 💻
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The dashboard involves two independent environments operating simultaneously.
 
-## Expanding the ESLint configuration
+**1. Start the IoT Bridge (Backend)**
+```bash
+cd backend
+npm install
+node virtual-device.js
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**2. Start the Hardware Dashboard (Frontend)**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+> **Note:** To see the Live Analytics, ensure the Data Source is set to "LIVE" and your physical hardware Device ID matches the one input in the Dashboard.
