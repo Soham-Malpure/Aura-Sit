@@ -1,0 +1,13 @@
+{
+  "name": "aura-backend",
+  "version": "1.0.0",
+  "description": "Virtual IoT NodeMCU Simulator for Aura-Sit",
+  "main": "virtual-device.js",
+  "type": "module",
+  "scripts": {
+    "start": "node virtual-device.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
