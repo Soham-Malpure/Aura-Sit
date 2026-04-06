@@ -40,6 +40,13 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-app);
+  /* Faint Blue, Green, and Amber geometric lines to give a high-tech tracking feel */
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.04) 1px, transparent 1px),
+    linear-gradient(45deg, rgba(245, 158, 11, 0.02) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(239, 68, 68, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px, 50px 50px, 150px 150px, 150px 150px;
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
