@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, handlePairDevice }) {
   const [calibrating, setCalibrating] = useState(false);
+  const [inputId, setInputId] = useState(pairedDeviceId);
 
   const handleCalibrate = () => {
     setCalibrating(true);
@@ -43,15 +44,27 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
             <input 
               type="text" 
               placeholder="e.g. AURA-X792"
-              value={pairedDeviceId}
-              onChange={(e) => handlePairDevice(e.target.value)}
+              value={inputId}
+              onChange={(e) => setInputId(e.target.value)}
               style={{ 
                 background: "var(--bg-muted)", color: "var(--text-primary)", 
                 border: "1px solid var(--border-color)", padding: "4px 8px", 
                 borderRadius: "6px", fontSize: "13px", width: "120px" 
               }}
             />
-            {pairedDeviceId && (
+            <button 
+              onClick={() => handlePairDevice(inputId)}
+              disabled={inputId === pairedDeviceId}
+              style={{ 
+                background: inputId === pairedDeviceId ? "var(--bg-muted)" : "var(--color-blue)", 
+                color: inputId === pairedDeviceId ? "var(--text-secondary)" : "white", 
+                border: "none", padding: "5px 12px", 
+                borderRadius: "6px", fontSize: "12px", fontWeight: 600, 
+                cursor: inputId === pairedDeviceId ? "not-allowed" : "pointer", transition: "0.2s" 
+              }}>
+              Pair
+            </button>
+            {pairedDeviceId && inputId === pairedDeviceId && (
               <span style={{ fontSize: "12px", color: "var(--color-healthy)", display: "flex", alignItems: "center", gap: 4 }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-healthy)" }}></span> Paired
               </span>

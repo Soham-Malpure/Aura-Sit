@@ -5,22 +5,33 @@ export function usePostureEngine(hardwareMode = "simulation") {
   const [chestDist, setChestDist] = useState(55);
   const [faceDist, setFaceDist] = useState(52);
   const [postureState, setPostureState] = useState("healthy");
-  const [totalSecs, setTotalSecs] = useState(120);
-  const [badSecs, setBadSecs] = useState(30);
-  const [history, setHistory] = useState(() =>
-    Array.from({ length: 10 }, (_, i) => ({
-      time: i * 3,
-      chest: 50 + Math.random() * 10,
-      face: 48 + Math.random() * 10,
-      state: "healthy"
-    }))
-  );
+  const [totalSecs, setTotalSecs] = useState(0);
+  const [badSecs, setBadSecs] = useState(0);
+  const [history, setHistory] = useState([]);
   const [insights, setInsights] = useState([]);
   const [pairedDeviceId, setPairedDeviceId] = useState(() => localStorage.getItem("aura_device_id") || "");
   const [activeShifts, setActiveShifts] = useState(0);
   const [ttfMinutes, setTtfMinutes] = useState(null);
+  const [isTracking, setIsTracking] = useState(false);
+
+  const isTrackingRef = useRef(isTracking);
+  useEffect(() => { isTrackingRef.current = isTracking; }, [isTracking]);
 
   const analyticsRef = useRef({ lastChest: 50, healthySecs: 0 });
+
+  const startTracking = () => {
+    setTotalSecs(0);
+    setBadSecs(0);
+    setHistory([]);
+    setActiveShifts(0);
+    setTtfMinutes(null);
+    analyticsRef.current.healthySecs = 0;
+    setIsTracking(true);
+  };
+
+  const endSession = () => {
+    setIsTracking(false);
+  };
 
   const handlePairDevice = (id) => {
     setPairedDeviceId(id);
@@ -83,23 +94,25 @@ export function usePostureEngine(hardwareMode = "simulation") {
             }
 
             const state = classifyPosture(data.chest);
-            processAnalytics(data.chest, state);
             setChestDist(data.chest);
             setFaceDist(data.face);
             setPostureState(state);
-            setTotalSecs(prev => prev + 3);
-            if (state !== "healthy") setBadSecs(prev => prev + 3);
-            
-            // Append history
-            setHistory(prev => {
-              const next = [...prev, {
-                time: prev.length * 3,
-                chest: data.chest,
-                face: data.face,
-                state
-              }].slice(-MAX_HISTORY);
-              return next;
-            });
+
+            if (isTrackingRef.current) {
+              processAnalytics(data.chest, state);
+              setTotalSecs(prev => prev + 3);
+              if (state !== "healthy") setBadSecs(prev => prev + 3);
+              
+              setHistory(prev => {
+                const next = [...prev, {
+                  time: prev.length * 3,
+                  chest: data.chest,
+                  face: data.face,
+                  state
+                }].slice(-MAX_HISTORY);
+                return next;
+              });
+            }
           }
         } catch(err) {
           console.error("Failed to parse socket payload", err);
@@ -116,48 +129,50 @@ export function usePostureEngine(hardwareMode = "simulation") {
       const newChest = 38 + Math.random() * 28;
       const newFace = 36 + Math.random() * 28;
       const state = classifyPosture(newChest);
-      processAnalytics(newChest, state);
-
       setChestDist(Math.round(newChest));
       setFaceDist(Math.round(newFace));
       setPostureState(state);
-      setTotalSecs(prev => prev + 3);
-      if (state !== "healthy") setBadSecs(prev => prev + 3);
 
-      setHistory(prev => {
-        const next = [...prev, {
-          time: prev.length * 3,
-          chest: newChest,
-          face: newFace,
-          state
-        }].slice(-MAX_HISTORY);
+      if (isTrackingRef.current) {
+        processAnalytics(newChest, state);
+        setTotalSecs(prev => prev + 3);
+        if (state !== "healthy") setBadSecs(prev => prev + 3);
 
-        // Insight detection
-        const recent = next.slice(-6);
-        const badCount = recent.filter(h => h.state !== "healthy").length;
-        const trend = next.slice(-3).map(h => h.chest);
-        const declining = trend.every((v, i) => i === 0 || v < trend[i - 1]);
+        setHistory(prev => {
+          const next = [...prev, {
+            time: prev.length * 3,
+            chest: newChest,
+            face: newFace,
+            state
+          }].slice(-MAX_HISTORY);
 
-        const newInsights = [];
-        if (badCount >= 4) newInsights.push({ type: "warn", text: "Frequent forward head posture in last 18s" });
-        if (declining) newInsights.push({ type: "danger", text: "Posture worsening rapidly — take a break" });
-        const avgChest = next.reduce((s, h) => s + h.chest, 0) / next.length;
-        if (avgChest < 47) newInsights.push({ type: "warn", text: "Session avg safely below threshold (50 cm)" });
-        if (next.length > 10) {
-          const firstHalf = next.slice(0, 5).reduce((s, h) => s + h.chest, 0) / 5;
-          const secondHalf = next.slice(-5).reduce((s, h) => s + h.chest, 0) / 5;
-          if (secondHalf < firstHalf - 3) newInsights.push({ type: "info", text: "Posture degrades after prolonged sitting window" });
-          if (secondHalf > firstHalf + 2) newInsights.push({ type: "ok", text: "Posture organically improved — good adjustment!" });
-        }
-        setInsights(newInsights.slice(0, 3));
-        return next;
-      });
+          // Insight detection
+          const recent = next.slice(-6);
+          const badCount = recent.filter(h => h.state !== "healthy").length;
+          const trend = next.slice(-3).map(h => h.chest);
+          const declining = trend.every((v, i) => i === 0 || v < trend[i - 1]);
+
+          const newInsights = [];
+          if (badCount >= 4) newInsights.push({ type: "warn", text: "Frequent forward head posture in last 18s" });
+          if (declining) newInsights.push({ type: "danger", text: "Posture worsening rapidly — take a break" });
+          const avgChest = next.reduce((s, h) => s + h.chest, 0) / next.length;
+          if (avgChest < 47) newInsights.push({ type: "warn", text: "Session avg safely below threshold (50 cm)" });
+          if (next.length > 10) {
+            const firstHalf = next.slice(0, 5).reduce((s, h) => s + h.chest, 0) / 5;
+            const secondHalf = next.slice(-5).reduce((s, h) => s + h.chest, 0) / 5;
+            if (secondHalf < firstHalf - 3) newInsights.push({ type: "info", text: "Posture degrades after prolonged sitting window" });
+            if (secondHalf > firstHalf + 2) newInsights.push({ type: "ok", text: "Posture organically improved — good adjustment!" });
+          }
+          setInsights(newInsights.slice(0, 3));
+          return next;
+        });
+      }
     }, 3000);
     return () => clearInterval(interval);
   }, [hardwareMode]);
 
-  const pqs = Math.round(100 - (badSecs / totalSecs) * 100);
-  const badPct = Math.round((badSecs / totalSecs) * 100);
+  const pqs = totalSecs > 0 ? Math.round(100 - (badSecs / totalSecs) * 100) : 100;
+  const badPct = totalSecs > 0 ? Math.round((badSecs / totalSecs) * 100) : 0;
   const totalMin = Math.round(totalSecs / 60);
   const badMin = Math.round(badSecs / 60);
 
@@ -188,6 +203,6 @@ export function usePostureEngine(hardwareMode = "simulation") {
     chestDist, faceDist, postureState, totalMin, badMin,
     pqs, badPct, avgChest, mostStrained, trend, history, insights,
     handleIoTMessage, pairedDeviceId, handlePairDevice,
-    activeShifts, ttfMinutes
+    activeShifts, ttfMinutes, isTracking, startTracking, endSession
   };
 }

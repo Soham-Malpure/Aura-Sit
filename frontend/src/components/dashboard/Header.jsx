@@ -1,6 +1,6 @@
 import { StatusDot } from "../common/StatusDot";
 
-export function Header({ postureState, totalMin, activeTab, setActiveTab, onExport, onSaveSession }) {
+export function Header({ postureState, totalMin, activeTab, setActiveTab, onExport, onSaveSession, isTracking, onStartTracking }) {
   const stateColor = { healthy: "var(--color-healthy)", warning: "var(--color-warning)", danger: "var(--color-danger)" }[postureState];
   const stateLabel = { healthy: "Healthy", warning: "Warning", danger: "Danger" }[postureState];
 
@@ -45,15 +45,27 @@ export function Header({ postureState, totalMin, activeTab, setActiveTab, onExpo
 
       {/* Right Actions */}
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        <button 
-          onClick={onSaveSession}
-          style={{
-            background: "var(--color-blue)", color: "white", 
-            border: "none", padding: "6px 12px", 
-            borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", transition: "0.2s"
-          }}>
-          Save Session
-        </button>
+        {!isTracking ? (
+          <button 
+            onClick={onStartTracking}
+            style={{
+              background: "var(--color-healthy)", color: "white", 
+              border: "none", padding: "6px 16px", 
+              borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "0.2s"
+            }}>
+            ▶ Start Tracking
+          </button>
+        ) : (
+          <button 
+            onClick={onSaveSession}
+            style={{
+              background: "var(--color-danger)", color: "white", 
+              border: "none", padding: "6px 16px", 
+              borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "0.2s"
+            }}>
+            ⏹ End & Save Session
+          </button>
+        )}
 
         <button 
           onClick={onExport}

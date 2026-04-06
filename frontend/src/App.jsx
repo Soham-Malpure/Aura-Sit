@@ -19,15 +19,17 @@ export default function App() {
   const {
     chestDist, faceDist, postureState, totalMin, badMin,
     pqs, badPct, avgChest, mostStrained, trend, history, insights,
-    pairedDeviceId, handlePairDevice, activeShifts, ttfMinutes
+    pairedDeviceId, handlePairDevice, activeShifts, ttfMinutes,
+    isTracking, startTracking, endSession
   } = usePostureEngine(hardwareMode);
 
   const handleExport = () => {
-    generateCSVReport(history, totalMin);
+    generateCSVReport();
   };
 
   const handleSaveSession = () => {
     saveSessionToStorage({ pqs, totalMin, avgChest, badPct });
+    endSession();
     alert("Session successfully saved! It will now display in your Historical Trends.");
   };
 
@@ -40,6 +42,8 @@ export default function App() {
         setActiveTab={setActiveTab} 
         onExport={handleExport}
         onSaveSession={handleSaveSession}
+        isTracking={isTracking}
+        onStartTracking={startTracking}
       />
       
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 24px" }}>
