@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
-import { getHistoryFromStorage } from "../../utils/storage";
+import { getHistoryFromFirebase } from "../../utils/storage";
 
-export function HistoryView() {
+export function HistoryView({ pairedDeviceId }) {
   const [savedSessions, setSavedSessions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setSavedSessions(getHistoryFromStorage());
-  }, []);
-
-  const handleClearData = () => {
-    if(window.confirm("Are you sure you want to flush all saved posture logs? This is useful for resetting before a fresh presentation.")) {
-      localStorage.removeItem("aura_history");
-      setSavedSessions([]);
+    async function loadData() {
+      setIsLoading(true);
+      const data = await getHistoryFromFirebase(pairedDeviceId);
+      setSavedSessions(data);
+      setIsLoading(false);
     }
-  };
+    loadData();
+  }, [pairedDeviceId]);
 
   const getHeatmapColor = (pqs) => {
     if (pqs >= 85) return "var(--color-healthy)";
@@ -39,19 +39,16 @@ export function HistoryView() {
       <div style={{ marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-primary)" }}>Historical Posture Trends</h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>Review your aggregate sitting data locally saved on this browser.</p>
+          <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>Review aggregate sitting data synced from the cloud for Device ID: <strong>{pairedDeviceId || "Anonymous"}</strong></p>
         </div>
-        <button 
-          onClick={handleClearData}
-          style={{
-            background: "transparent", color: "var(--color-danger)", 
-            border: "1px solid var(--color-danger)", padding: "8px 16px", 
-            borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", transition: "0.2s"
-          }}
-        >
-          Flush Analytics Data
-        </button>
       </div>
+      
+      {isLoading ? (
+        <div style={{ textAlign: "center", padding: "40px", color: "var(--text-secondary)" }}>
+          Loading cloud payload securely...
+        </div>
+      ) : (
+        <>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
         <div className="card">
@@ -99,6 +96,8 @@ export function HistoryView() {
           <span>More Healthy</span>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

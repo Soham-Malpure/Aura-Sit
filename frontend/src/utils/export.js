@@ -1,7 +1,7 @@
-import { getHistoryFromStorage } from "./storage";
+import { getHistoryFromFirebase } from "./storage";
 
-export function generateCSVReport() {
-  const savedLogs = getHistoryFromStorage();
+export async function generateCSVReport(deviceId) {
+  const savedLogs = await getHistoryFromFirebase(deviceId);
   
   if (savedLogs.length === 0) {
     alert("No saved sessions found to export. Try completing and saving a session first!");

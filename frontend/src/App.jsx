@@ -9,8 +9,8 @@ import { StretchRecommendations } from "./components/dashboard/StretchRecommenda
 import { DeviceManager } from "./components/dashboard/DeviceManager";
 import { HistoryView } from "./components/dashboard/HistoryView";
 import { generateCSVReport } from "./utils/export";
-import { saveSessionToStorage } from "./utils/storage";
-import "./index.css"; 
+import { saveSessionToFirebase } from "./utils/storage";
+import "./index.css";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("live");
@@ -23,14 +23,18 @@ export default function App() {
     isTracking, startTracking, endSession
   } = usePostureEngine(hardwareMode);
 
-  const handleExport = () => {
-    generateCSVReport();
+  const handleExport = async () => {
+    await generateCSVReport(pairedDeviceId);
   };
 
-  const handleSaveSession = () => {
-    saveSessionToStorage({ pqs, totalMin, avgChest, badPct });
-    endSession();
-    alert("Session successfully saved! It will now display in your Historical Trends.");
+  const handleSaveSession = async () => {
+    const success = await saveSessionToFirebase({ pqs, totalMin, avgChest, badPct }, pairedDeviceId);
+    if (success) {
+      endSession();
+      alert("Session saved to Cloud Firestore! It will now display in your Historical Trends on all devices.");
+    } else {
+      alert("Failed to save to cloud. Check console for details.");
+    }
   };
 
   return (
@@ -79,7 +83,7 @@ export default function App() {
             </div>
           </>
         ) : (
-          <HistoryView />
+          <HistoryView pairedDeviceId={pairedDeviceId} />
         )}
 
         {/* Footer */}
