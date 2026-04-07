@@ -40,13 +40,6 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-app);
-  /* Faint Blue, Green, and Amber geometric lines to give a high-tech tracking feel */
-  background-image: 
-    linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 197, 94, 0.04) 1px, transparent 1px),
-    linear-gradient(45deg, rgba(245, 158, 11, 0.02) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(239, 68, 68, 0.02) 1px, transparent 1px);
-  background-size: 50px 50px, 50px 50px, 150px 150px, 150px 150px;
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -56,11 +49,34 @@ body {
 
 @keyframes waveDrift {
   0% {
-    background-position: 0px 0px, 0px 0px, 0px 0px;
+    background-position:
+      0px 0px,
+      0px 0px,
+      0px 0px,
+      0px 0px,
+      0px 0px;
+    transform: rotate(0deg) scale(1.1);
   }
+
+  50% {
+    background-position:
+      600px -80px,
+      -450px 100px,
+      900px 20px,
+      -300px -60px,
+      700px 120px;
+    transform: rotate(-1deg) scale(1.15);
+  }
+
   100% {
     /* Different X/Y drift rates create parallax, randomizing the overlap */
-    background-position: 800px -100px, -600px 150px, 1200px 50px;
+    background-position: 
+      1200px -150px, 
+      -900px 200px, 
+      1800px 60px,
+      -600px -120px,
+      1400px 250px;
+    transform: rotate(1deg) scale(1.1);
   }
 }
 
@@ -68,18 +84,20 @@ body::before {
   content: "";
   position: fixed;
   inset: -20%;
-  /* 3 overlapping FILLED colored waves using asymmetric Cubic Bezier paths (random shapes) */
+  /* 5 overlapping FILLED colored waves using asymmetric complex Cubic Beziers (highly random shapes) */
   background-image:
-    url("data:image/svg+xml,%3Csvg width='100' height='30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 15 C30 -5, 60 35, 100 15 L 100 30 L 0 30 Z' fill='rgba(59, 130, 246, 0.07)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg width='100' height='35' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 C20 40, 70 -10, 100 20 L 100 35 L 0 35 Z' fill='rgba(34, 197, 94, 0.05)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg width='100' height='25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 C45 35, 80 -15, 100 10 L 100 25 L 0 25 Z' fill='rgba(245, 158, 11, 0.04)'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg width='150' height='50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 15 C 20 -10, 40 40, 60 15 C 80 -10, 110 30, 150 15 L 150 50 L 0 50 Z' fill='rgba(59, 130, 246, 0.08)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='200' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 25 C 30 60, 60 -10, 100 30 C 130 70, 160 5, 200 25 L 200 60 L 0 60 Z' fill='rgba(34, 197, 94, 0.06)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='250' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 C 40 -15, 70 30, 120 10 C 160 -10, 200 40, 250 10 L 250 40 L 0 40 Z' fill='rgba(245, 158, 11, 0.05)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='320' height='70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30 C 50 70, 90 -10, 150 30 C 210 70, 260 -10, 320 30 L 320 70 L 0 70 Z' fill='rgba(139, 92, 246, 0.07)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='180' height='50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 C 60 -20, 120 80, 180 20 L 180 50 L 0 50 Z' fill='rgba(14, 165, 233, 0.05)'/%3E%3C/svg%3E");
 
-  /* Randomly scaled SVGs breaking symmetry */
-  background-size: 600px 300px, 450px 220px, 750px 400px;
-  filter: blur(8px);
+  /* Randomly scaled SVGs breaking symmetry entirely */
+  background-size: 700px 350px, 500px 280px, 900px 480px, 600px 320px, 800px 400px;
+  filter: blur(12px);
   z-index: -1;
   pointer-events: none;
-  animation: waveDrift 12s linear infinite alternate;
+  animation: waveDrift 25s ease-in-out infinite alternate;
 }
 
 @keyframes fadeIn {
