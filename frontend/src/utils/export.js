@@ -1,4 +1,5 @@
 import { getHistoryFromFirebase } from "./storage";
+import html2canvas from "html2canvas";
 
 export async function generateCSVReport(deviceId) {
   const savedLogs = await getHistoryFromFirebase(deviceId);
@@ -38,4 +39,36 @@ export async function generateCSVReport(deviceId) {
   document.body.appendChild(link); // Required for Firefox
   link.click();
   document.body.removeChild(link);
+}
+
+export async function exportVisualSessionReport() {
+  const container = document.getElementById("session-report-container");
+  if (!container) {
+    console.error("Session report container not found in DOM");
+    return false;
+  }
+  
+  try {
+    // Generate canvas and apply high quality scale
+    const canvas = await html2canvas(container, {
+      backgroundColor: "#09090b", // match var(--bg-app)
+      scale: 2, // makes the PNG high resolution
+      logging: false,
+      useCORS: true // in case of external images
+    });
+
+    // Create Download Link
+    const imgData = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = imgData;
+    link.download = `AuraSit_Session_Export_${new Date().toISOString().slice(0, 10)}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    return true;
+  } catch (err) {
+    console.error("Failed to generate visual report", err);
+    return false;
+  }
 }

@@ -6,13 +6,19 @@ export function SummaryCards({
   chestDist, faceDist, postureState, 
   pqs, badPct, totalMin, badMin, 
   avgChest, mostStrained,
-  activeShifts, ttfMinutes
+  activeShifts, ttfMinutes, isTracking
 }) {
   const stateColor = { healthy: "var(--color-healthy)", warning: "var(--color-warning)", danger: "var(--color-danger)" }[postureState];
   const stateLabel = { healthy: "Healthy", warning: "Warning", danger: "Danger" }[postureState];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 20 }}>
+    <div style={{ 
+      display: "grid", 
+      gridTemplateColumns: isTracking ? "repeat(4, 1fr)" : "1fr", 
+      gap: 16, 
+      marginBottom: 20,
+      transition: "grid-template-columns 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
+    }}>
       {/* Live Posture */}
       <div className="card" style={{ borderTop: `3px solid ${stateColor}` }}>
         <div className="card-label">Live Posture</div>
@@ -36,8 +42,9 @@ export function SummaryCards({
         </div>
       </div>
 
-      {/* Posture Score */}
-      <div className="card">
+      {/* Posture Score (Only when tracking) */}
+      {isTracking && (
+        <div className="card" style={{ animation: "fadeIn 0.4s ease-out forwards" }}>
         <div className="card-label">Posture Quality Score</div>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 8 }}>
           <ScoreRing value={pqs} />
@@ -50,9 +57,11 @@ export function SummaryCards({
           </div>
         </div>
       </div>
+      )}
 
-      {/* Sitting Analysis */}
-      <div className="card">
+      {/* Sitting Analysis (Only when tracking) */}
+      {isTracking && (
+        <div className="card" style={{ animation: "fadeIn 0.5s ease-out forwards" }}>
         <div className="card-label">Sitting Analysis</div>
         <div style={{ marginTop: 8 }}>
           <div style={{ fontSize: 26, fontWeight: 700 }}>{totalMin}m</div>
@@ -70,10 +79,12 @@ export function SummaryCards({
             <MiniBar pct={badPct} color="var(--color-danger)" />
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
-      {/* Analytics Summary */}
-      <div className="card">
+      {/* Analytics Summary (Only when tracking) */}
+      {isTracking && (
+        <div className="card" style={{ animation: "fadeIn 0.6s ease-out forwards" }}>
         <div className="card-label">Session Analytics</div>
         <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -98,7 +109,8 @@ export function SummaryCards({
             </span>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,12 +13,12 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
   };
 
   return (
-    <div className="card" style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div className="card" style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "30px 40px" }}>
       {/* Network & Source */}
       <div style={{ display: "flex", gap: 30, alignItems: "center" }}>
         <div>
-          <div className="card-label">Data Engine Source</div>
-          <div style={{ marginTop: 8, display: "flex", gap: 8, alignItems: "center" }}>
+          <div className="card-label" style={{ fontSize: "13px" }}>Data Engine Source</div>
+          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <span style={{ 
                 width: 10, height: 10, borderRadius: "50%", 
                 background: hardwareMode === "live" ? "var(--color-healthy)" : "var(--color-warning)",
@@ -27,7 +27,7 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
             <select 
               value={hardwareMode} 
               onChange={(e) => setHardwareMode(e.target.value)}
-              style={{ background: "var(--bg-muted)", color: "var(--text-primary)", border: "1px solid var(--border-color)", padding: "4px 8px", borderRadius: "6px", fontSize: "13px" }}
+              style={{ background: "var(--bg-muted)", color: "var(--text-primary)", border: "1px solid var(--border-color)", padding: "10px 14px", borderRadius: "8px", fontSize: "15px" }}
             >
               <option value="simulation">MOCK - Software Simulation</option>
               <option value="live">LIVE - NodeMCU WebSocket Feed</option>
@@ -39,8 +39,8 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
 
         {/* Device Pairing */}
         <div>
-          <div className="card-label">Paired Hardware Device</div>
-          <div style={{ marginTop: 8, display: "flex", gap: 8, alignItems: "center" }}>
+          <div className="card-label" style={{ fontSize: "13px" }}>Paired Hardware Device</div>
+          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <input 
               type="text" 
               placeholder="e.g. AURA-X792"
@@ -48,8 +48,8 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
               onChange={(e) => setInputId(e.target.value)}
               style={{ 
                 background: "var(--bg-muted)", color: "var(--text-primary)", 
-                border: "1px solid var(--border-color)", padding: "4px 8px", 
-                borderRadius: "6px", fontSize: "13px", width: "120px" 
+                border: "1px solid var(--border-color)", padding: "10px 14px", 
+                borderRadius: "8px", fontSize: "15px", width: "160px" 
               }}
             />
             <button 
@@ -58,8 +58,8 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
               style={{ 
                 background: inputId === pairedDeviceId ? "var(--bg-muted)" : "var(--color-blue)", 
                 color: inputId === pairedDeviceId ? "var(--text-secondary)" : "white", 
-                border: "none", padding: "5px 12px", 
-                borderRadius: "6px", fontSize: "12px", fontWeight: 600, 
+                border: "none", padding: "10px 20px", 
+                borderRadius: "8px", fontSize: "14px", fontWeight: 600, 
                 cursor: inputId === pairedDeviceId ? "not-allowed" : "pointer", transition: "0.2s" 
               }}>
               Pair
@@ -81,8 +81,8 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
           disabled={calibrating}
           style={{ 
             background: calibrating ? "var(--bg-muted)" : "var(--color-blue)", 
-            color: "white", border: "none", padding: "10px 20px", borderRadius: "8px", 
-            fontSize: "13px", fontWeight: 600, cursor: calibrating ? "not-allowed" : "pointer" 
+            color: "white", border: "none", padding: "14px 28px", borderRadius: "8px", 
+            fontSize: "15px", fontWeight: 600, cursor: calibrating ? "not-allowed" : "pointer" 
           }}>
           {calibrating ? "Calibrating Sensors..." : "Calibrate Baseline (50cm)"}
         </button>
