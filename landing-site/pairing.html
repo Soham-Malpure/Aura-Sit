@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura-Sit – Device Pairing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        :root {
+            --bg-main: #f5f5f7;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-primary: #0071e3;
+            --accent-success: #34c759;
+            --accent-error: #ff3b30;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            --border-radius: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e8edf5 100%);
+        }
+
+        /* Animated abstract background */
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(0,113,227,0.1) 0%, rgba(52,199,89,0.1) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: 0;
+            animation: breathe 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Paired Card Container */
+        .pairing-card {
+            position: relative;
+            z-index: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 48px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Hardware Illustration */
+        .hardware-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: #fff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.02);
+            color: var(--accent-primary);
+            position: relative;
+            transition: color 0.5s ease;
+        }
+
+        .hardware-icon.connected { color: var(--accent-success); }
+        .hardware-icon.failed { color: var(--accent-error); }
+
+        .pairing-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .pairing-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        /* Input Field */
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(0,0,0,0.2);
+            text-transform: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        }
+
+        /* Primary Button */
+        button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent-primary);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #0060c2;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Status States */
+        .state-layer {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .state-layer.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Spinner */
+        .loader {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Texts */
+        .status-text { font-weight: 500; }
+        .connecting { color: var(--accent-primary); }
+        .connected { color: var(--accent-success); display: flex; align-items: center; gap: 8px;}
+        .failed { color: var(--accent-error); display: flex; align-items: center; gap: 8px;}
+
+        /* Ripples for Hardware icon when searching */
+        .hardware-icon.searching::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            border: 2px solid var(--accent-primary);
+            animation: ripple 1.5s infinite ease-out;
+            opacity: 0;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        /* Secondary actions */
+        .retry-btn {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid rgba(0,0,0,0.1);
+            margin-top: 16px;
+        }
+
+        .retry-btn:hover { background: rgba(0,0,0,0.03); color: var(--text-primary); }
+        
+        .dashboard-btn {
+            background: var(--text-primary);
+            margin-top: 16px;
+        }
+        
+        .dashboard-btn:hover { background: #000; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <div class="pairing-card">
+        
+        <div class="hardware-icon" id="hardwareIcon">
+            <i data-feather="cpu" style="width: 32px; height: 32px;"></i>
+        </div>
+
+        <h2>Pair Aura-Sit Sensor</h2>
+        <p>Wirelessly connect your posture tracking node to the dashboard environment.</p>
+
+        <!-- Initial Input State -->
+        <div id="stateInput" class="state-layer active">
+            <div class="input-group" style="width: 100%;">
+                <label for="deviceId">Device Signature</label>
+                <input type="text" id="deviceId" placeholder="e.g., AURA-X792" autocomplete="off" spellcheck="false" maxlength="12">
+            </div>
+            <button id="connectBtn">
+                Connect Device
+            </button>
+        </div>
+
+        <!-- Connecting State -->
+        <div id="stateConnecting" class="state-layer">
+            <div class="loader"></div>
+            <span class="status-text connecting">Searching for Device...</span>
+        </div>
+
+        <!-- Success State -->
+        <div id="stateSuccess" class="state-layer">
+            <span class="status-text connected"><i data-feather="check-circle"></i> Successfully Paired</span>
+            <p style="margin-bottom: 0px; margin-top: 8px;">Your node is now bridging data securely.</p>
+            <button class="dashboard-btn" onclick="goToDashboard()">Go to Dashboard</button>
+        </div>
+
+        <!-- Failed State -->
+        <div id="stateFailed" class="state-layer">
+            <span class="status-text failed"><i data-feather="alert-circle"></i> Connection Failed</span>
+            <p style="margin-bottom: 0px; margin-top: 8px;">Device not found. Ensure it is powered on and within range.</p>
+            <button class="retry-btn" onclick="resetState()">Try Again</button>
+        </div>
+
+    </div>
+
+    <script>
+        feather.replace();
+
+        const inputLayer = document.getElementById('stateInput');
+        const connectLayer = document.getElementById('stateConnecting');
+        const successLayer = document.getElementById('stateSuccess');
+        const failedLayer = document.getElementById('stateFailed');
+        const hardwareIcon = document.getElementById('hardwareIcon');
+        const deviceInput = document.getElementById('deviceId');
+        const connectBtn = document.getElementById('connectBtn');
+
+        // Input formatter (auto formats to uppercase and masks AURA prefixes nicely)
+        deviceInput.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+
+        deviceInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                startPairing();
+            }
+        });
+
+        connectBtn.addEventListener('click', startPairing);
+
+        function startPairing() {
+            const devId = deviceInput.value.trim();
+            if (!devId) {
+                deviceInput.focus();
+                deviceInput.style.borderColor = 'var(--accent-error)';
+                setTimeout(() => { deviceInput.style.borderColor = 'rgba(0,0,0,0.1)'; }, 1000);
+                return;
+            }
+
+            // Switch to Connecting UI
+            switchLayer(connectLayer);
+            hardwareIcon.classList.add('searching');
+            hardwareIcon.classList.remove('failed', 'connected');
+            
+            // Randomize success/failure based on the input just for pure realism demo
+            // If they type "AURA-X792" it works, otherwise random success/fail.
+            let willSucceed = Math.random() > 0.4; 
+            if (devId === 'AURA-X792') willSucceed = true; // Guaranteed success for standard mock id
+
+            setTimeout(() => {
+                hardwareIcon.classList.remove('searching');
+                
+                if (willSucceed) {
+                    switchLayer(successLayer);
+                    hardwareIcon.classList.add('connected');
+                } else {
+                    switchLayer(failedLayer);
+                    hardwareIcon.classList.add('failed');
+                }
+            }, 3000); // 3 second fake loading delay
+        }
+
+        function resetState() {
+            switchLayer(inputLayer);
+            hardwareIcon.classList.remove('failed', 'connected');
+            deviceInput.value = '';
+            deviceInput.focus();
+        }
+
+        function switchLayer(layerActive) {
+            [inputLayer, connectLayer, successLayer, failedLayer].forEach(l => {
+                l.classList.remove('active');
+            });
+            layerActive.classList.add('active');
+        }
+
+        function goToDashboard() {
+            // Because they run their real dashboard on localhost:5173
+            window.location.href = "http://localhost:5173/";
+        }
+
+    </script>
+</body>
+</html>

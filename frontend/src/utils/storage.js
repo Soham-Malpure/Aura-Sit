@@ -1,10 +1,15 @@
 import { collection, addDoc, getDocs, query, orderBy, limit, where } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 
 export async function saveSessionToFirebase(sessionData, deviceId) {
   try {
+    const user = auth.currentUser;
+    const uid = user ? user.uid : "anonymous";
+    const targetDevice = deviceId || "anonymous";
+
     const docRef = await addDoc(collection(db, "sessions"), {
-      deviceId: deviceId || "anonymous",
+      uid: uid,
+      deviceId: targetDevice,
       date: new Date().toISOString(),
       timestamp: Date.now(), // Useful for ordering
       ...sessionData
@@ -19,11 +24,24 @@ export async function saveSessionToFirebase(sessionData, deviceId) {
 
 export async function getHistoryFromFirebase(deviceId) {
   try {
+    const user = auth.currentUser;
+    const uid = user ? user.uid : "anonymous";
     const targetDevice = deviceId || "anonymous";
-    const q = query(
-      collection(db, "sessions"),
-      where("deviceId", "==", targetDevice)
-    );
+    
+    let q;
+    // If a user is logged in, grab all *their* data privately, no matter the device
+    if (user) {
+      q = query(
+        collection(db, "sessions"),
+        where("uid", "==", uid)
+      );
+    } else {
+      // Fallback for public shared devices if unauthenticated
+      q = query(
+        collection(db, "sessions"),
+        where("deviceId", "==", targetDevice)
+      );
+    }
     
     const querySnapshot = await getDocs(q);
     const sessions = [];

@@ -29,8 +29,8 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
               onChange={(e) => setHardwareMode(e.target.value)}
               style={{ background: "var(--bg-muted)", color: "var(--text-primary)", border: "1px solid var(--border-color)", padding: "10px 14px", borderRadius: "8px", fontSize: "15px" }}
             >
-              <option value="simulation">MOCK - Software Simulation</option>
-              <option value="live">LIVE - NodeMCU WebSocket Feed</option>
+              <option value="simulation" style={{ background: "#151515" }}>MOCK - Software Simulation</option>
+              <option value="live" style={{ background: "#151515" }}>LIVE - NodeMCU WebSocket Feed</option>
             </select>
           </div>
         </div>

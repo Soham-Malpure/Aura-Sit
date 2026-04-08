@@ -1,13 +1,16 @@
 import { StatusDot } from "../common/StatusDot";
+import { useAuth } from "../../context/AuthContext";
 
 export function Header({ postureState, totalMin, activeTab, setActiveTab, onExport, onSaveSession, isTracking, onStartTracking }) {
+  const { logout } = useAuth();
   const stateColor = { healthy: "var(--color-healthy)", warning: "var(--color-warning)", danger: "var(--color-danger)" }[postureState];
   const stateLabel = { healthy: "Healthy", warning: "Warning", danger: "Danger" }[postureState];
 
   return (
     <header style={{
       background: "var(--bg-card)", borderBottom: "1px solid var(--border-color)",
-      padding: "14px 28px", display: "flex", justifyContent: "space-between", alignItems: "center"
+      padding: "14px 28px", display: "flex", justifyContent: "space-between", alignItems: "center",
+      backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)"
     }}>
       {/* Brand & Tabs container */}
       <div style={{ display: "flex", alignItems: "center", gap: 40 }}>
@@ -25,7 +28,7 @@ export function Header({ postureState, totalMin, activeTab, setActiveTab, onExpo
         </div>
 
         {/* Tab Switcher */}
-        <div style={{ display: "flex", background: "var(--bg-app)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+        <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
           <button 
             onClick={() => setActiveTab("live")}
             style={{ 
@@ -63,7 +66,7 @@ export function Header({ postureState, totalMin, activeTab, setActiveTab, onExpo
               border: "none", padding: "6px 16px", 
               borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "0.2s"
             }}>
-            ⏹ End & Save Session
+            ⏹ End Session
           </button>
         )}
 
@@ -75,6 +78,16 @@ export function Header({ postureState, totalMin, activeTab, setActiveTab, onExpo
             borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer"
           }}>
           Export CSV
+        </button>
+
+        <button 
+          onClick={() => logout()}
+          style={{
+            background: "transparent", color: "var(--accent-error)", 
+            border: "1px solid rgba(255, 69, 58, 0.3)", padding: "6px 12px", 
+            borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer"
+          }}>
+          Log Out
         </button>
 
         <div style={{
