@@ -1,10 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Activity, Shield, Cpu, ArrowRight } from "lucide-react";
 import "../../landing.css";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const videoRef = useRef(null);
+
+  const handleDemoClick = (e) => {
+    e.preventDefault();
+    const demoSection = document.getElementById("demo");
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    if (videoRef.current) {
+      setTimeout(() => videoRef.current.play(), 600); // Wait for scroll
+    }
+  };
 
   useEffect(() => {
     // Scroll Animation Observer Setup
@@ -68,7 +80,7 @@ export default function LandingPage() {
             <button onClick={() => navigate("/login")} className="landing-btn btn-primary">
               Get Started
             </button>
-            <a href="#demo" className="landing-btn btn-secondary">
+            <a href="#demo" onClick={handleDemoClick} className="landing-btn btn-secondary">
               View Demo <ArrowRight size={18} />
             </a>
           </div>
@@ -76,25 +88,17 @@ export default function LandingPage() {
       </section>
 
       {/* Visual / Demo Section */}
-      <section id="demo" className="visual-section fade-in">
+      <section id="demo" className="visual-section fade-in" style={{ scrollMarginTop: "100px" }}>
         <div className="landing-container">
-          <div className="visual-wrapper glass-panel">
-            <div className="visual-content">
-              <div className="posture-illustration">
-                <div className="spine-container">
-                  <div className="spine-dot dot-1"></div>
-                  <div className="spine-dot dot-2"></div>
-                  <div className="spine-dot dot-3"></div>
-                  <div className="spine-dot dot-4"></div>
-                  <div className="spine-dot dot-5"></div>
-                </div>
-                <div className="status-indicator">
-                  <div className="pulse-ring"></div>
-                  <span className="status-text">Perfect Alignment</span>
-                </div>
-              </div>
-            </div>
-            <div className="visual-bg"></div>
+          <div className="visual-wrapper glass-panel" style={{ padding: 0, height: "auto", aspectRatio: "16/9" }}>
+            <video 
+              ref={videoRef}
+              src="/demo_vid.mp4" 
+              controls 
+              style={{ width: "100%", height: "100%", borderRadius: "var(--border-radius-lg)", objectFit: "cover", backgroundColor: "#000" }}
+            >
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       </section>
