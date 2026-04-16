@@ -71,22 +71,73 @@ float measureDistance(int trigPin, int echoPin) {
   return duration * 0.034 / 2; // Distance in cm
 }
 
+// Advanced Noise Filter: Drops invalid pings entirely
+float getSmoothDistance(int trigPin, int echoPin, float fallbackValue) {
+  const int requiredSamples = 5;
+  const int maxAttempts = 15; // Don't get stuck in infinite loop
+  float samples[requiredSamples];
+  int validCount = 0;
+  
+  for (int i = 0; i < maxAttempts; i++) {
+    float dist = measureDistance(trigPin, echoPin);
+    
+    // Only accept realistic human sitting distances (e.g., 5cm to 200cm)
+    if (dist > 5.0 && dist < 200.0) {
+      samples[validCount] = dist;
+      validCount++;
+    }
+    
+    if (validCount >= requiredSamples) break;
+    delay(20); // Delay between pings
+  }
+  
+  // If sensor is totally blocked or malfunctioning, keep previous value to avoid spikes
+  if (validCount < requiredSamples) {
+    return fallbackValue;
+  }
+  
+  // Sort samples
+  for (int i = 0; i < requiredSamples - 1; i++) {
+    for (int j = i + 1; j < requiredSamples; j++) {
+      if (samples[i] > samples[j]) {
+        float temp = samples[i];
+        samples[i] = samples[j];
+        samples[j] = temp;
+      }
+    }
+  }
+  
+  // Average only the middle 3
+  return (samples[1] + samples[2] + samples[3]) / 3.0;
+}
+
+// Keep track of the last good readings
+float lastChestDist = 50.0;
+float lastFaceDist = 50.0;
+
 void loop() {
   webSocket.loop();
 
-  // Run measurement every 3 seconds to avoid noise
   static unsigned long lastUpdate = 0;
   if(millis() - lastUpdate > 3000) {
     lastUpdate = millis();
     
-    float chestDist = measureDistance(trigPin1, echoPin1);
-    float faceDist = measureDistance(trigPin2, echoPin2);
+    // Get Chest Distance
+    lastChestDist = getSmoothDistance(trigPin1, echoPin1, lastChestDist);
+    
+    // --- CROSSTALK PREVENTION ---
+    // Physical sound waves bounce around the room. We MUST wait for the room to be quiet 
+    // before firing the second sensor, otherwise Sensor 2 accidentally reads Sensor 1's echo!
+    delay(100); 
+    
+    // Get Face Distance
+    lastFaceDist = getSmoothDistance(trigPin2, echoPin2, lastFaceDist);
     
     // Construct JSON payload manually (for lightweight memory)
     String jsonPayload = "{\"type\":\"sensor_reading\",\"chest\":";
-    jsonPayload += String(chestDist);
+    jsonPayload += String(lastChestDist);
     jsonPayload += ",\"face\":";
-    jsonPayload += String(faceDist);
+    jsonPayload += String(lastFaceDist);
     jsonPayload += "}";
     
     // Send to web dashboard
