@@ -16,7 +16,7 @@ const char* password = "YOUR_WIFI_PASSWORD";
 
 // WebSocket Server IP (The IP of the computer running your React app server if hosting WS there)
 // In a cloud architecture, this would safely route to AWS/Firebase or a hosted Node.js server.
-const char* ws_host = "192.168.1.100"; 
+const char* ws_host = "10.160.157.64"; 
 const uint16_t ws_port = 8080;
 
 WebSocketsClient webSocket;

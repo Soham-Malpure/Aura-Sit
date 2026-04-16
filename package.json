@@ -1,0 +1,23 @@
+{
+  "name": "aura-sit",
+  "version": "1.0.0",
+  "description": "> A comprehensive, True IoT customized posture-monitoring ecosystem bridging custom hardware with a highly responsive, analytical SaaS dashboard.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Soham-Malpure/Aura-Sit.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Soham-Malpure/Aura-Sit/issues"
+  },
+  "homepage": "https://github.com/Soham-Malpure/Aura-Sit#readme",
+  "dependencies": {
+    "ws": "^8.20.0"
+  }
+}
