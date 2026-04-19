@@ -77,12 +77,15 @@ export function usePostureEngine(hardwareMode = "simulation") {
     
     // When switching to live mode, establish WebSocket connection
     if (hardwareMode === "live") {
-      const wsHost = window.location.hostname;
-      socket = new WebSocket(`ws://${wsHost}:8080`);
-      
-      socket.onopen = () => {
-        console.log("Connected to hardware WebSocket");
-      };
+      try {
+        // If deployed to a real website (vercel/netlify web), window.location.hostname is the cloud domain.
+        // To avoid an immediate Mixed Content crash (ws:// on https://), we wrap it in a try-catch.
+        // We connect back to localhost since the Node server is running on the local machine.
+        socket = new WebSocket("ws://localhost:8080");
+        
+        socket.onopen = () => {
+          console.log("Connected to hardware WebSocket");
+        };
       
       socket.onmessage = (event) => {
         try {
@@ -121,7 +124,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
       };
 
       return () => {
-        socket.close();
+        if (socket) socket.close();
       };
     }
 
