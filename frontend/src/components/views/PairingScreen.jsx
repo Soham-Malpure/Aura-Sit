@@ -46,6 +46,9 @@ export default function PairingScreen() {
     setTimeout(() => {
       setIconClass(willSucceed ? "connected" : "failed");
       setPairingState(willSucceed ? "success" : "failed");
+      if (willSucceed) {
+        localStorage.setItem("aura_device_id", devId);
+      }
     }, 3000); // 3 second fake loading delay
   };
 
