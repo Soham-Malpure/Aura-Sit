@@ -126,6 +126,11 @@ export function usePostureEngine(hardwareMode = "simulation") {
       return () => {
         if (socket) socket.close();
       };
+    } catch (err) {
+      console.error("Mixed content security block on Websocket:", err);
+      // Fall back safely without crashing React
+      return () => {};
+    }
     }
 
     // SIMULATION MODE
