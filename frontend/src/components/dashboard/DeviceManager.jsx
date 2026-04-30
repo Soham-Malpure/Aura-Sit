@@ -1,16 +1,7 @@
 import { useState } from "react";
 
 export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, handlePairDevice }) {
-  const [calibrating, setCalibrating] = useState(false);
   const [inputId, setInputId] = useState(pairedDeviceId);
-
-  const handleCalibrate = () => {
-    setCalibrating(true);
-    setTimeout(() => {
-      setCalibrating(false);
-      alert("Baseline perfectly calibrated to 50cm. You are ready to go!");
-    }, 2000);
-  };
 
   return (
     <div className="card" style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "30px 40px" }}>
@@ -90,20 +81,6 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
           </div>
         </div>
 
-      </div>
-
-      {/* Sensor Calibration */}
-      <div>
-        <button 
-          onClick={handleCalibrate} 
-          disabled={calibrating}
-          style={{ 
-            background: calibrating ? "var(--bg-muted)" : "var(--color-blue)", 
-            color: "white", border: "none", padding: "14px 28px", borderRadius: "8px", 
-            fontSize: "15px", fontWeight: 600, cursor: calibrating ? "not-allowed" : "pointer" 
-          }}>
-          {calibrating ? "Calibrating Sensors..." : "Calibrate Baseline (50cm)"}
-        </button>
       </div>
     </div>
   );

@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Activity, Shield, Cpu, ArrowRight } from "lucide-react";
+import { Activity, Shield, Cpu, ArrowRight, Zap } from "lucide-react";
 import "../../landing.css";
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const glowRef = useRef(null);
+  const ambientLightRef = useRef(null);
 
   const handleDemoClick = (e) => {
     e.preventDefault();
@@ -35,20 +37,58 @@ export default function LandingPage() {
     }, observerOptions);
 
     const animateElements = document.querySelectorAll(
-      ".fade-in, .fade-in-up, .fade-in-right"
+      ".fade-in, .fade-in-up, .fade-in-right, .pop-in"
     );
     animateElements.forEach((el) => {
       observer.observe(el);
     });
 
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let currentX = window.innerWidth / 2;
+    let currentY = window.innerHeight / 2;
+    let animationFrameId;
+
+    const handleMouseMove = (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+    };
+
+    const animateGlow = () => {
+      // Lerp (Linear Interpolation) for that smooth spring/jitter effect
+      currentX += (targetX - currentX) * 0.15;
+      currentY += (targetY - currentY) * 0.15;
+
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate3d(calc(${currentX}px - 50%), calc(${currentY}px - 50%), 0)`;
+      }
+      animationFrameId = requestAnimationFrame(animateGlow);
+    };
+
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        navigate("/login");
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("keydown", handleKeyDown);
+    animateGlow();
+
     return () => {
       animateElements.forEach((el) => observer.unobserve(el));
       observer.disconnect();
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("keydown", handleKeyDown);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
     <div className="landing-body">
+      <div className="ambient-scroll-light" ref={ambientLightRef}></div>
+      <div className="cursor-glow" ref={glowRef}></div>
       {/* Header Navigation */}
       <header className="landing-header">
         <div className="landing-container header-container">
@@ -58,8 +98,8 @@ export default function LandingPage() {
           </div>
           <nav className="landing-nav">
             <a href="#features">Features</a>
-            <a href="#how-it-works">How it Works</a>
-            <button onClick={() => navigate("/login")} className="nav-cta" style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem'}}>
+            <a href="#demo" onClick={handleDemoClick}>How it Works</a>
+            <button onClick={() => navigate("/login")} className="nav-cta" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>
               Get Started
             </button>
           </nav>
@@ -67,34 +107,35 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="hero glass-element">
-        <div className="hero-bg-gradient"></div>
+      <section className="hero">
         <div className="landing-container">
-          <h1 className="hero-title fade-in-up">
+          <h1 className="hero-title pop-in">
             Fix Your Posture.<br />Effortlessly.
           </h1>
-          <p className="hero-subtitle fade-in-up delay-1">
+          <p className="hero-subtitle pop-in delay-1">
             Aura-Sit uses real-time sensing and intelligent feedback to improve your sitting habits without the hassle of wearables or cameras.
           </p>
-          <div className="hero-ctas fade-in-up delay-2">
+          <div className="hero-ctas pop-in delay-2">
             <button onClick={() => navigate("/login")} className="landing-btn btn-primary">
-              Get Started
+              Get Started 
             </button>
-            <a href="#demo" onClick={handleDemoClick} className="landing-btn btn-secondary">
-              View Demo <ArrowRight size={18} />
-            </a>
           </div>
+
         </div>
       </section>
 
-      {/* Visual / Demo Section */}
-      <section id="demo" className="visual-section fade-in" style={{ scrollMarginTop: "100px" }}>
+      {/* Video Section */}
+      <section id="demo" className="video-section">
         <div className="landing-container">
-          <div className="visual-wrapper glass-panel" style={{ padding: 0, height: "auto", aspectRatio: "16/9" }}>
-            <video 
+          <div className="hero-visual glass-panel pop-in delay-2">
+            <video
               ref={videoRef}
-              src="/demo_vid.mp4" 
-              controls 
+              src="/demo_vid.mp4"
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
               style={{ width: "100%", height: "100%", borderRadius: "var(--border-radius-lg)", objectFit: "cover", backgroundColor: "#000" }}
             >
               Your browser does not support the video tag.
@@ -103,71 +144,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Bento Grid Section */}
       <section id="features" className="features-section">
         <div className="landing-container">
           <div className="section-header fade-in">
-            <h2>Designed for Wellness</h2>
-            <p>Everything you need to maintain a healthy back.</p>
+            <h2>Everything you need <br />To fix your Posture.</h2>
           </div>
 
-          <div className="features-grid">
-            <div className="feature-card glass-panel fade-in-up">
-              <div className="feature-icon icon-blue">
-                <Activity size={24} />
+          <div className="bento-grid">
+            <div className="bento-item bento-large pop-in">
+              <div className="bento-icon-wrapper">
+                <Activity size={26} className="bento-icon" />
               </div>
-              <h3>Real-Time Monitoring</h3>
-              <p>Continuous millimeter-precise tracking of your spinal curve ensures instant detection of slouching and immediate correction prompts.</p>
-            </div>
-
-            <div className="feature-card glass-panel fade-in-up delay-1">
-              <div className="feature-icon icon-green">
-                <Shield size={24} />
-              </div>
-              <h3>Privacy-First</h3>
-              <p>No cameras. No cloud processing of images. Aura-Sit relies entirely on ultrasonic distance sensors, ensuring your environment remains private.</p>
-            </div>
-
-            <div className="feature-card glass-panel fade-in-up delay-2">
-              <div className="feature-icon icon-purple">
-                <Cpu size={24} />
-              </div>
-              <h3>Smart Feedback</h3>
-              <p>The decentralized Posture Engine actively tracks fatigue and micro-adjustments, recommending active stretches exactly when your body needs them.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="how-it-works-section">
-        <div className="landing-container">
-          <div className="section-header fade-in">
-            <h2>How It Works</h2>
-          </div>
-
-          <div className="timeline">
-            <div className="timeline-item fade-in-right">
-              <div className="timeline-marker">1</div>
-              <div className="timeline-content glass-panel">
-                <h4>Sensing Environment</h4>
-                <p>Our unobtrusive hardware uses precise distance measurements to map your seating position in real-time.</p>
+              <div className="bento-content">
+                <h3>Real-Time Monitoring</h3>
+                <p>Continuous millimeter-precise tracking of your spinal curve ensures instant detection of slouching and immediate correction prompts.</p>
               </div>
             </div>
 
-            <div className="timeline-item fade-in-right delay-1">
-              <div className="timeline-marker">2</div>
-              <div className="timeline-content glass-panel">
-                <h4>Edge Processing</h4>
-                <p>A NodeMCU microcontroller packages this raw data and beams it wirelessly and securely directly to your device.</p>
+            <div className="bento-item bento-small pop-in delay-1">
+              <div className="bento-icon-wrapper">
+                <Shield size={26} className="bento-icon" />
+              </div>
+              <div className="bento-content">
+                <h3>Privacy-First</h3>
+                <p>No cameras. No cloud processing. Everything stays on the edge.</p>
               </div>
             </div>
 
-            <div className="timeline-item fade-in-right delay-2">
-              <div className="timeline-marker">3</div>
-              <div className="timeline-content glass-panel">
-                <h4>Intelligent Feedback</h4>
-                <p>The Aura-Sit Dashboard contextualizes the data seamlessly into a beautiful interface, empowering you to adjust naturally.</p>
+            <div className="bento-item bento-small pop-in delay-2">
+              <div className="bento-icon-wrapper">
+                <Cpu size={26} className="bento-icon" />
+              </div>
+              <div className="bento-content">
+                <h3>Sensing Environment</h3>
+                <p>Unobtrusive hardware uses ultrasonic distance measurements to map your seating position in real-time.</p>
+              </div>
+            </div>
+
+            <div className="bento-item bento-large pop-in delay-2">
+              <div className="bento-icon-wrapper">
+                <Zap size={26} className="bento-icon" />
+              </div>
+              <div className="bento-content">
+                <h3>Intelligent Feedback</h3>
+                <p>The decentralized Posture Engine actively tracks fatigue and micro-adjustments, recommending active stretches exactly when your body needs them.</p>
               </div>
             </div>
           </div>
@@ -180,10 +201,11 @@ export default function LandingPage() {
           <div className="footer-content">
             <div className="footer-brand">
               <h2>Aura-Sit</h2>
-              <p>Project A</p>
             </div>
             <div className="footer-credits">
-              <p>Built by Soham Malpure</p>
+              <p>Built by Soham Malpure</p><br />
+              <p>+91 8208836121</p><br />
+              <p>soham.malpure2509@gmail.com</p><br />
             </div>
           </div>
         </div>

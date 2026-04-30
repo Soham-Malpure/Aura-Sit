@@ -29,11 +29,32 @@ const int echoPin1 = D2;
 const int trigPin2 = D3;
 const int echoPin2 = D4;
 
+// LED Pin Setup (Using D5 since D4 is used by Face Sensor)
+const int LED_PIN = D5;
+int ledBlinkMode = 0; // 0 = Solid/Off, 1 = Slow, 2 = Fast
+unsigned long blinkInterval = 0;
+bool currentLedState = false;
+
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   if(type == WStype_TEXT) {
     String msg = (char*)payload;
     if(msg == "calibrate") {
       Serial.println("[Command Received] Dashboard requested calibration lock.");
+    }
+    else if (msg.indexOf("\"led_command\"") >= 0) {
+      if (msg.indexOf("\"red\"") >= 0) {
+        ledBlinkMode = 0;
+        digitalWrite(LED_PIN, HIGH);
+      } else if (msg.indexOf("\"off\"") >= 0) {
+        ledBlinkMode = 0;
+        digitalWrite(LED_PIN, LOW);
+      } else if (msg.indexOf("\"blink_slow\"") >= 0) {
+        ledBlinkMode = 1;
+        blinkInterval = 1000;
+      } else if (msg.indexOf("\"blink_fast\"") >= 0) {
+        ledBlinkMode = 2;
+        blinkInterval = 250;
+      }
     }
   }
 }
@@ -46,6 +67,9 @@ void setup() {
   
   pinMode(trigPin2, OUTPUT);
   pinMode(echoPin2, INPUT);
+
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
 
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -117,6 +141,16 @@ float lastFaceDist = 50.0;
 
 void loop() {
   webSocket.loop();
+
+  // LED Blinking Logic (Non-blocking)
+  if (ledBlinkMode > 0) {
+    static unsigned long lastBlinkTime = 0;
+    if (millis() - lastBlinkTime >= blinkInterval) {
+      lastBlinkTime = millis();
+      currentLedState = !currentLedState;
+      digitalWrite(LED_PIN, currentLedState ? HIGH : LOW);
+    }
+  }
 
   static unsigned long lastUpdate = 0;
   if(millis() - lastUpdate > 3000) {

@@ -1,12 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import { classifyPosture, getBodyPart, MAX_HISTORY } from "../utils/posture";
+import { classifyPosture, getBodyPart, MAX_HISTORY, evaluate, calibrate, isCalibrated } from "../utils/posture";
 
 export function usePostureEngine(hardwareMode = "simulation") {
+  const socketRef = useRef(null);
   const [chestDist, setChestDist] = useState(55);
   const [faceDist, setFaceDist] = useState(52);
   const [postureState, setPostureState] = useState("healthy");
+  const [baseline, setBaseline] = useState(null);
+  const [neckAngle, setNeckAngle] = useState(0);
+  const [spineState, setSpineState] = useState("healthy");
+  const [neckState, setNeckState] = useState("healthy");
+  const [currentStretch, setCurrentStretch] = useState(null);
+
+  const handleCalibrate = () => {
+    const result = calibrate(chestDist, faceDist);
+    setBaseline(result);
+  };
   const [totalSecs, setTotalSecs] = useState(0);
   const [badSecs, setBadSecs] = useState(0);
+  const [sessionTotals, setSessionTotals] = useState({ healthy: 0, warning: 0, danger: 0 });
   const [history, setHistory] = useState([]);
   const [insights, setInsights] = useState([]);
   const [pairedDeviceId, setPairedDeviceId] = useState(() => localStorage.getItem("aura_device_id") || "");
@@ -22,6 +34,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
   const startTracking = () => {
     setTotalSecs(0);
     setBadSecs(0);
+    setSessionTotals({ healthy: 0, warning: 0, danger: 0 });
     setHistory([]);
     setActiveShifts(0);
     setTtfMinutes(null);
@@ -45,7 +58,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
 
   const processAnalytics = (newChest, state) => {
     const shift = Math.abs(newChest - analyticsRef.current.lastChest);
-    if (shift >= 1.5 && state === "healthy") {
+    if (shift >= 2.5 && state === "healthy") {
       setActiveShifts(prev => prev + 1);
     }
     analyticsRef.current.lastChest = newChest;
@@ -60,14 +73,36 @@ export function usePostureEngine(hardwareMode = "simulation") {
     }
   };
 
+  const sendLedCommand = (state) => {
+    if (hardwareMode === "live" && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      let ledState = "off";
+      if (!isCalibrated()) {
+        ledState = "blink_fast";
+      } else if (state === "healthy") {
+        ledState = "off";
+      } else if (state === "warning") {
+        ledState = "blink_slow";
+      } else if (state === "danger") {
+        ledState = "red";
+      }
+      socketRef.current.send(JSON.stringify({ type: "led_command", state: ledState }));
+    }
+  };
+
   // Hardware Placeholder Handler
   const handleIoTMessage = (data) => {
     // Expected structure: { chest: 45, face: 42 }
-    const state = classifyPosture(data.chest);
+    const result = evaluate(data.chest, data.face);
     setChestDist(Math.round(data.chest));
     setFaceDist(Math.round(data.face));
-    setPostureState(state);
+    setPostureState(result.state);
+    setSpineState(result.spineState);
+    setNeckState(result.neckState);
+    setNeckAngle(result.neckAngle);
+    if (result.stretch) setCurrentStretch(result.stretch);
     
+    sendLedCommand(result.state);
+
     // Update logic mirrors simulation below but relies on true data pushes
     // Currently stubbed out waiting for real socket connections.
   };
@@ -82,6 +117,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
         // To avoid an immediate Mixed Content crash (ws:// on https://), we wrap it in a try-catch.
         // We connect back to localhost since the Node server is running on the local machine.
         socket = new WebSocket("ws://localhost:8080");
+        socketRef.current = socket;
         
         socket.onopen = () => {
           console.log("Connected to hardware WebSocket");
@@ -97,22 +133,29 @@ export function usePostureEngine(hardwareMode = "simulation") {
               return;
             }
 
-            const state = classifyPosture(data.chest);
+            const result = evaluate(data.chest, data.face);
             setChestDist(data.chest);
             setFaceDist(data.face);
-            setPostureState(state);
+            setPostureState(result.state);
+            setSpineState(result.spineState);
+            setNeckState(result.neckState);
+            setNeckAngle(result.neckAngle);
+            if (result.stretch) setCurrentStretch(result.stretch);
+
+            sendLedCommand(result.state);
 
             if (isTrackingRef.current) {
-              processAnalytics(data.chest, state);
+              processAnalytics(data.chest, result.state);
               setTotalSecs(prev => prev + 3);
-              if (state !== "healthy") setBadSecs(prev => prev + 3);
+              if (result.state !== "healthy") setBadSecs(prev => prev + 3);
+              setSessionTotals(prev => ({ ...prev, [result.state]: prev[result.state] + 3 }));
               
               setHistory(prev => {
                 const next = [...prev, {
                   time: prev.length * 3,
                   chest: data.chest,
                   face: data.face,
-                  state
+                  state: result.state
                 }].slice(-MAX_HISTORY);
                 return next;
               });
@@ -137,22 +180,29 @@ export function usePostureEngine(hardwareMode = "simulation") {
     const interval = setInterval(() => {
       const newChest = 38 + Math.random() * 28;
       const newFace = 36 + Math.random() * 28;
-      const state = classifyPosture(newChest);
+      const result = evaluate(newChest, newFace);
       setChestDist(Math.round(newChest));
       setFaceDist(Math.round(newFace));
-      setPostureState(state);
+      setPostureState(result.state);
+      setSpineState(result.spineState);
+      setNeckState(result.neckState);
+      setNeckAngle(result.neckAngle);
+      if (result.stretch) setCurrentStretch(result.stretch);
+
+      sendLedCommand(result.state);
 
       if (isTrackingRef.current) {
-        processAnalytics(newChest, state);
+        processAnalytics(newChest, result.state);
         setTotalSecs(prev => prev + 3);
-        if (state !== "healthy") setBadSecs(prev => prev + 3);
+        if (result.state !== "healthy") setBadSecs(prev => prev + 3);
+        setSessionTotals(prev => ({ ...prev, [result.state]: prev[result.state] + 3 }));
 
         setHistory(prev => {
           const next = [...prev, {
             time: prev.length * 3,
             chest: newChest,
             face: newFace,
-            state
+            state: result.state
           }].slice(-MAX_HISTORY);
 
           // Insight detection
@@ -189,6 +239,10 @@ export function usePostureEngine(hardwareMode = "simulation") {
     ? Math.round(history.reduce((s, h) => s + h.chest, 0) / history.length)
     : 0;
 
+  const avgFace = history.length
+    ? Math.round(history.reduce((s, h) => s + h.face, 0) / history.length)
+    : 0;
+
   const strainCounts = history.reduce((acc, h) => {
     const part = getBodyPart(h.state);
     acc[part] = (acc[part] || 0) + 1;
@@ -210,8 +264,10 @@ export function usePostureEngine(hardwareMode = "simulation") {
 
   return {
     chestDist, faceDist, postureState, totalMin, badMin,
-    pqs, badPct, avgChest, mostStrained, trend, history, insights,
+    pqs, badPct, avgChest, avgFace, mostStrained, trend, history, insights,
     handleIoTMessage, pairedDeviceId, handlePairDevice,
-    activeShifts, ttfMinutes, isTracking, startTracking, endSession
+    activeShifts, ttfMinutes, isTracking, startTracking, endSession,
+    baseline, neckAngle, spineState, neckState, postureScore: pqs, handleCalibrate,
+    sessionTotals, currentStretch
   };
 }

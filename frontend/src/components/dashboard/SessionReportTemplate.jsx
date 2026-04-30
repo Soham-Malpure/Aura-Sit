@@ -45,8 +45,57 @@ export function SessionReportTemplate({ metrics, history, dateString, isVisible 
            }}>AS</div>
         </div>
 
-        {/* Metrics Row */}
-        <SummaryCards {...metrics} isTracking={true} />
+        {/* Merged New Analytics (PQS, Stretch, Breakdown) */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 30 }}>
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(34, 145, 255, 0.05)', border: '1px solid rgba(34, 145, 255, 0.2)' }}>
+            <div className="card-label" style={{ marginBottom: 12 }}>Posture Quality Score</div>
+            <div style={{ fontSize: '4.5rem', fontWeight: 700, color: '#2291FF', textShadow: '0 0 20px rgba(34, 145, 255, 0.3)' }}>{Math.round(metrics.pqs)}</div>
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(50, 215, 75, 0.1)", padding: "14px 20px", borderRadius: 10, border: "1px solid rgba(50, 215, 75, 0.2)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600, fontSize: "1.1rem" }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#32D74B" }}></div>Healthy Time
+              </div>
+              <div style={{ fontFamily: "monospace", fontSize: "1.3rem", fontWeight: "bold" }}>{metrics.sessionTotals?.healthy || 0}s</div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255, 159, 10, 0.1)", padding: "14px 20px", borderRadius: 10, border: "1px solid rgba(255, 159, 10, 0.2)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600, fontSize: "1.1rem" }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#FF9F0A" }}></div>Warning Time
+              </div>
+              <div style={{ fontFamily: "monospace", fontSize: "1.3rem", fontWeight: "bold" }}>{metrics.sessionTotals?.warning || 0}s</div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255, 69, 58, 0.1)", padding: "14px 20px", borderRadius: 10, border: "1px solid rgba(255, 69, 58, 0.2)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600, fontSize: "1.1rem" }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#FF453A" }}></div>Danger Time
+              </div>
+              <div style={{ fontFamily: "monospace", fontSize: "1.3rem", fontWeight: "bold" }}>{metrics.sessionTotals?.danger || 0}s</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 30 }}>
+          <div className="card">
+            <div className="card-label">Average Neck Tilt</div>
+            <div style={{ fontSize: '3rem', fontWeight: 700, color: 'white', marginTop: 10 }}>{Math.round(metrics.neckAngle || 0)}°</div>
+          </div>
+          <div className="card" style={{ background: "linear-gradient(135deg, rgba(34, 145, 255, 0.15), rgba(34, 145, 255, 0.05))", border: "1px solid rgba(34, 145, 255, 0.3)" }}>
+            <div className="card-label" style={{ color: "#2291FF", marginBottom: 10 }}>Prescribed Recovery Stretch</div>
+            {metrics.currentStretch ? (
+              <>
+                <div style={{ color: "#2291FF", fontWeight: 700, fontSize: "1.4rem", marginBottom: 8 }}>{metrics.currentStretch.name || metrics.currentStretch.title}</div>
+                <div style={{ color: "rgba(255,255,255,0.85)", lineHeight: 1.5, fontSize: "1.05rem" }}>{metrics.currentStretch.description || metrics.currentStretch.desc}</div>
+              </>
+            ) : (
+              <div style={{ fontStyle: "italic", opacity: 0.7, fontSize: "1.05rem" }}>
+                No severe posture strain detected during this session. Keep up the good work!
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Legacy Metrics Row */}
+        <SummaryCards {...metrics} isTracking={true} hideSittingAnalysis={true} />
 
         {/* Extra detailed metrics as requested by user */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
@@ -66,10 +115,6 @@ export function SessionReportTemplate({ metrics, history, dateString, isVisible 
            <DataIntelligence insights={metrics.insights || []} history={history || []} />
         </div>
         
-        {/* Footer */}
-        <div style={{ marginTop: 40, textAlign: "center", fontSize: 11, color: "var(--text-secondary)" }}>
-          Aura-Sit IoT Posture Monitoring System — Machine-Learning Enhanced Output
-        </div>
     </div>
   )
 }

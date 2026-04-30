@@ -39,6 +39,15 @@ wss.on('connection', function connection(ws) {
         
         // Console log for debugging
         console.log(`[HARDWARE] Relayed data -> Chest: ${parsed.chest}cm, Face: ${parsed.face}cm`);
+      } else if (parsed.type === "led_command") {
+        // Broadcast this command to all OTHER connected clients (i.e. the ESP8266 Hardware)
+        clients.forEach((client) => {
+          if (client !== ws && client.readyState === ws.OPEN) {
+            client.send(msg);
+          }
+        });
+        
+        console.log(`[LED] Forwarding command: ${parsed.state} to hardware`);
       }
     } catch (e) {
       // It might not be JSON, check if it's a command from the frontend

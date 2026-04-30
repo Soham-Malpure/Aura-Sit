@@ -1,6 +1,85 @@
 export const THRESHOLDS = { danger: 45, warning: 50 };
 export const MAX_HISTORY = 20;
 
+let baseline = null;
+let smoothingWindow = [];
+
+export function calibrate(chest, face) {
+  baseline = { chest, face };
+  smoothingWindow = [];
+  return baseline;
+}
+
+export function resetCalibration() {
+  baseline = null;
+  smoothingWindow = [];
+}
+
+export function isCalibrated() {
+  return baseline !== null;
+}
+
+export function evaluate(chest, face) {
+  // Maintain rolling window of last 5
+  smoothingWindow.push({ chest, face });
+  if (smoothingWindow.length > 5) {
+    smoothingWindow.shift();
+  }
+
+  // Compute averages
+  const avgChest = smoothingWindow.reduce((s, r) => s + r.chest, 0) / smoothingWindow.length;
+  const avgFace = smoothingWindow.reduce((s, r) => s + r.face, 0) / smoothingWindow.length;
+
+  // Classify Spine State
+  let spineState = "healthy";
+  if (baseline) {
+    const delta = baseline.chest - avgChest;
+    if (delta >= 12) spineState = "danger";
+    else if (delta >= 5) spineState = "warning";
+  } else {
+    spineState = classifyPosture(avgChest);
+  }
+
+  // Compute Neck Angle
+  const neckAngleRaw = Math.atan2(avgChest - avgFace, 30) * (180 / Math.PI);
+  const neckAngle = Math.round(neckAngleRaw * 10) / 10;
+
+  // Classify Neck State
+  let neckState = "healthy";
+  if (neckAngle >= 20) neckState = "danger";
+  else if (neckAngle >= 10) neckState = "warning";
+
+  // Worst State
+  const stateWeight = { healthy: 0, warning: 1, danger: 2 };
+  const state = stateWeight[spineState] > stateWeight[neckState] ? spineState : neckState;
+
+  // Alerts
+  const alerts = [];
+  if (spineState === "danger") alerts.push("Severe lower back strain detected.");
+  else if (spineState === "warning") alerts.push("Mild forward lean detected.");
+  if (neckState === "danger") alerts.push("Severe forward head posture.");
+  else if (neckState === "warning") alerts.push("Mild forward head posture.");
+
+  // Stretch Recommendation
+  let stretch = null;
+  if (state !== "healthy") {
+    const possibleStretches = STRETCHES[state];
+    stretch = possibleStretches[Math.floor(Math.random() * possibleStretches.length)];
+  }
+
+  return {
+    state,
+    spineState,
+    neckState,
+    neckAngle,
+    alerts,
+    stretch,
+    smoothedChest: Math.round(avgChest),
+    smoothedFace: Math.round(avgFace),
+    calibrated: isCalibrated()
+  };
+}
+
 export function classifyPosture(chest) {
   if (chest < THRESHOLDS.danger) return "danger";
   if (chest < THRESHOLDS.warning) return "warning";

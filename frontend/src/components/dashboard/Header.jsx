@@ -29,62 +29,66 @@ export function Header({ postureState, totalMin, activeTab, setActiveTab, onExpo
 
         {/* Tab Switcher */}
         <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", padding: "4px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
-          <button 
+          <button
             onClick={() => setActiveTab("live")}
-            style={{ 
+            style={{
               background: activeTab === "live" ? "var(--bg-card)" : "transparent",
               color: activeTab === "live" ? "var(--text-primary)" : "var(--text-secondary)",
               border: "none", padding: "6px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
-          }}>Live Monitor</button>
-          <button 
+            }}>Live Monitor</button>
+          <button
             onClick={() => setActiveTab("history")}
-            style={{ 
+            style={{
               background: activeTab === "history" ? "var(--bg-card)" : "transparent",
               color: activeTab === "history" ? "var(--text-primary)" : "var(--text-secondary)",
               border: "none", padding: "6px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer", transition: "all 0.2s"
-          }}>Historical Trends</button>
+            }}>Historical Trends</button>
         </div>
       </div>
 
       {/* Right Actions */}
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         {!isTracking ? (
-          <button 
+          <button
             onClick={onStartTracking}
             style={{
-              background: "var(--color-healthy)", color: "white", 
-              border: "none", padding: "6px 16px", 
-              borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "0.2s"
+              background: "var(--color-healthy)", color: "white",
+              border: "none", padding: "10px 24px",
+              borderRadius: "8px", fontSize: "15px", fontWeight: 800, cursor: "pointer", transition: "0.2s",
+              boxShadow: "0 4px 12px rgba(50, 215, 75, 0.3)"
             }}>
             ▶ Start Tracking
           </button>
         ) : (
-          <button 
+          <button
             onClick={onSaveSession}
             style={{
-              background: "var(--color-danger)", color: "white", 
-              border: "none", padding: "6px 16px", 
-              borderRadius: "6px", fontSize: "13px", fontWeight: 700, cursor: "pointer", transition: "0.2s"
+              background: "var(--color-danger)", color: "white",
+              border: "none", padding: "10px 24px",
+              borderRadius: "8px", fontSize: "15px", fontWeight: 800, cursor: "pointer", transition: "0.2s",
+              boxShadow: "0 4px 12px rgba(255, 69, 58, 0.3)"
             }}>
             ⏹ End Session
           </button>
         )}
 
-        <button 
-          onClick={onExport}
-          style={{
-            background: "transparent", color: "var(--text-primary)", 
-            border: "1px solid var(--border-color)", padding: "6px 12px", 
-            borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer"
-          }}>
-          Export CSV
-        </button>
+        {activeTab === "history" && (
+          <button
+            onClick={onExport}
+            style={{
+              background: "transparent", color: "var(--text-primary)",
+              border: "1px solid var(--border-color)", padding: "6px 12px",
+              borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer"
+            }}>
+            Export CSV
+          </button>
+        )}
 
-        <button 
+        <button
           onClick={() => logout()}
           style={{
-            background: "transparent", color: "var(--accent-error)", 
-            border: "1px solid rgba(255, 69, 58, 0.3)", padding: "6px 12px", 
+            background: "transparent", color: "var(--accent-error)",
+            border: "1px solid rgba(255, 69, 58, 0.3)", padding: "6px 12px",
             borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer"
           }}>
           Log Out

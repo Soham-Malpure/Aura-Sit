@@ -36,26 +36,7 @@ export function DataIntelligence({ insights, history }) {
         </div>
       )}
 
-      {/* Pattern summary */}
-      <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border-color)" }}>
-        <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-          Posture Distribution
-        </div>
-        {["healthy", "warning", "danger"].map(s => {
-          const cnt = history.filter(h => h.state === s).length;
-          const pct = history.length ? Math.round((cnt / history.length) * 100) : 0;
-          const c = { healthy: "var(--color-healthy)", warning: "var(--color-warning)", danger: "var(--color-danger)" }[s];
-          return (
-            <div key={s} style={{ marginBottom: 6 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text-secondary)", marginBottom: 2 }}>
-                <span style={{ textTransform: "capitalize" }}>{s}</span>
-                <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{pct}%</span>
-              </div>
-              <MiniBar pct={pct} color={c} />
-            </div>
-          );
-        })}
-      </div>
+
     </div>
   );
 }

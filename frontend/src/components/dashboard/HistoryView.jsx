@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getHistoryFromFirebase } from "../../utils/storage";
+import { getHistoryFromFirebase, clearHistoryFromFirebase } from "../../utils/storage";
 
 export function HistoryView({ pairedDeviceId }) {
   const [savedSessions, setSavedSessions] = useState([]);
@@ -14,6 +14,15 @@ export function HistoryView({ pairedDeviceId }) {
     }
     loadData();
   }, [pairedDeviceId]);
+
+  const handleClearLogs = async () => {
+    if (window.confirm("Are you sure you want to delete all your saved session logs? This action cannot be undone.")) {
+      setIsLoading(true);
+      await clearHistoryFromFirebase(pairedDeviceId);
+      setSavedSessions([]);
+      setIsLoading(false);
+    }
+  };
 
   const getHeatmapColor = (pqs) => {
     if (pqs >= 85) return "var(--color-healthy)";
@@ -41,6 +50,25 @@ export function HistoryView({ pairedDeviceId }) {
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-primary)" }}>Historical Posture Trends</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>Review aggregate sitting data synced from the cloud for Device ID: <strong>{pairedDeviceId || "Anonymous"}</strong></p>
         </div>
+        <button 
+          onClick={handleClearLogs}
+          disabled={savedSessions.length === 0 || isLoading}
+          style={{
+            background: "rgba(255, 69, 58, 0.1)",
+            color: "var(--color-danger)",
+            border: "1px solid rgba(255, 69, 58, 0.3)",
+            padding: "8px 16px",
+            borderRadius: "8px",
+            fontWeight: "600",
+            cursor: savedSessions.length === 0 || isLoading ? "not-allowed" : "pointer",
+            opacity: savedSessions.length === 0 || isLoading ? 0.5 : 1,
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => { if (savedSessions.length > 0 && !isLoading) e.target.style.background = "rgba(255, 69, 58, 0.2)" }}
+          onMouseLeave={(e) => { if (savedSessions.length > 0 && !isLoading) e.target.style.background = "rgba(255, 69, 58, 0.1)" }}
+        >
+          Delete Logs
+        </button>
       </div>
       
       {isLoading ? (
