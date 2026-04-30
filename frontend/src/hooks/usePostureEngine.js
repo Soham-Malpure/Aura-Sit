@@ -263,7 +263,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
   }
 
   return {
-    chestDist, faceDist, postureState, totalMin, badMin,
+    chestDist, faceDist, postureState, totalMin, badMin, totalSecs, badSecs,
     pqs, badPct, avgChest, avgFace, mostStrained, trend, history, insights,
     handleIoTMessage, pairedDeviceId, handlePairDevice,
     activeShifts, ttfMinutes, isTracking, startTracking, endSession,

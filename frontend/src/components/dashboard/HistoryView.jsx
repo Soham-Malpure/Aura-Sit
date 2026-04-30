@@ -35,7 +35,7 @@ export function HistoryView({ pairedDeviceId }) {
     ? Math.round(savedSessions.reduce((sum, s) => sum + s.pqs, 0) / savedSessions.length)
     : 0;
 
-  const totalMinRecorded = savedSessions.reduce((sum, s) => sum + s.totalMin, 0);
+  const totalMinRecorded = Math.round(savedSessions.reduce((sum, s) => sum + (s.totalSecs ? s.totalSecs / 60 : (s.totalMin || 0)), 0));
 
   // Generate 30 day blocks (pad with zeroes for empty days)
   const mapData = [...savedSessions.map(s => s.pqs)];

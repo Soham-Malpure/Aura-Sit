@@ -22,7 +22,7 @@ export default function DashboardView() {
   const [hardwareMode, setHardwareMode] = useState("simulation"); // 'simulation' vs 'live'
 
   const {
-    chestDist, faceDist, postureState, totalMin, badMin,
+    chestDist, faceDist, postureState, totalMin, badMin, totalSecs, badSecs,
     pqs, badPct, avgChest, avgFace, mostStrained, trend, history, insights,
     pairedDeviceId, handlePairDevice, activeShifts, ttfMinutes,
     isTracking, startTracking, endSession,
