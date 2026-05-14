@@ -1,8 +1,8 @@
-# 🌟 Aura-Sit
+# 🌟 VerteX
 
 > A comprehensive, True IoT customized posture-monitoring ecosystem bridging custom hardware with a highly responsive, analytical SaaS dashboard.
 
-Aura-Sit is designed to map real-time human mechanics to actionable health intelligence. By employing a NodeMCU microcontroller streaming raw distance data via Wi-Fi securely over WebSockets, we eliminate serialized tethers and create an ambient sensor ecosystem.
+VerteX is designed to map real-time human mechanics to actionable health intelligence. By employing a NodeMCU microcontroller streaming raw distance data via Wi-Fi securely over WebSockets, we eliminate serialized tethers and create an ambient sensor ecosystem.
 
 ---
 
@@ -12,7 +12,7 @@ Aura-Sit is designed to map real-time human mechanics to actionable health intel
 *   **Ergonomic Activity Index:** Actively tracks user micro-adjustments (>1.5cm shifts) to encourage dynamic "active sitting" rather than static freezing.
 *   **Time-to-Fatigue Profiling:** Intelligently tracks the specific endurance of a user, predicting when muscles typically fatigue and degrade into postural compression.
 *   **Biomechanical Risk Mapping:** Translates abstract numeric thresholds into anatomical risk factors (e.g., *Cervical Spine Strain* vs *Lumbar Compression*).
-*   **True IoT Architecture:** Enforces Device Pairing signatures (e.g., `AURA-X792`), preventing data overlap and securing streams in multi-user environments.
+*   **True IoT Architecture:** Enforces Device Pairing signatures (e.g., `VERTEX-X792`), preventing data overlap and securing streams in multi-user environments.
 
 ---
 

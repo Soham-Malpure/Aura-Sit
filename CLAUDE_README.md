@@ -1,10 +1,10 @@
-# 🤖 Aura-Sit: Complete Project Context for Claude
+# 🤖 VerteX: Complete Project Context for Claude
 
-Hello Claude! This document serves as the "brain-dump" and context map for the **Aura-Sit** project. Use this reference to understand the complete system architecture, folder structure, code workflows, and recent development milestones.
+Hello Claude! This document serves as the "brain-dump" and context map for the **VerteX** project. Use this reference to understand the complete system architecture, folder structure, code workflows, and recent development milestones.
 
 ## 🌟 1. Project Overview
 
-**Aura-Sit** is a comprehensive, "True IoT" posture-monitoring ecosystem. It bridges custom physical hardware (ultrasonic sensors) with a highly responsive, analytical web dashboard. The objective is to map real-time human mechanics to actionable health intelligence without relying on serialized USB connections.
+**VerteX** is a comprehensive, "True IoT" posture-monitoring ecosystem. It bridges custom physical hardware (ultrasonic sensors) with a highly responsive, analytical web dashboard. The objective is to map real-time human mechanics to actionable health intelligence without relying on serialized USB connections.
 
 ### 🔑 Core Capabilities
 - **Decentralized Posture Engine:** A custom-built AI ruleset running entirely inside the user's web browser, ensuring zero-latency calculations and 100% data privacy.
@@ -42,7 +42,7 @@ The project consists of three distinct pillars operating simultaneously:
 ## 📁 4. Directory Structure
 
 ```text
-aura-sit/
+vertex/
 ├── /hardware
 │   └── NodeMCU_HCSR04.ino       # C++ firmware flashed to the NodeMCU. Connects to Wi-Fi, reads pins, emits WS payloads.
 │
@@ -73,7 +73,7 @@ aura-sit/
 ## 🚦 5. Data Flow & Security
 
 ### Device Pairing Flow
-To prevent random data crossover, the hardware embeds a static Device ID (e.g., `"AURA-X792"`) into every JSON payload. The React dashboard will *only* react to data if its internal "Paired Source" setting matches the incoming Device ID.
+To prevent random data crossover, the hardware embeds a static Device ID (e.g., `"VERTEX-X792"`) into every JSON payload. The React dashboard will *only* react to data if its internal "Paired Source" setting matches the incoming Device ID.
 
 ### Protected Routes
 `App.jsx` enforces security via a `ProtectedRoute` wrapper. 
@@ -85,7 +85,7 @@ The `backend/virtual-device.js` script accepts JSON like this:
 ```json
 {
   "type": "sensor_reading", 
-  "deviceId": "AURA-X792", 
+  "deviceId": "VERTEX-X792", 
   "chest": 45, 
   "face": 52
 }

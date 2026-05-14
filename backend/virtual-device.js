@@ -1,7 +1,8 @@
 import { WebSocketServer } from 'ws';
+import fs from 'fs';
 
 console.log("=========================================");
-console.log("📡 AURA-SIT Node.js Relay Server INITIALIZED");
+console.log("📡 VERTEX Node.js Relay Server INITIALIZED");
 console.log("👂 Listening for connections on ws://localhost:8080");
 console.log("=========================================");
 
@@ -11,18 +12,20 @@ const wss = new WebSocketServer({ port: 8080 });
 const clients = new Set();
 
 wss.on('connection', function connection(ws) {
-  console.log("[EVENT] New client connected!");
   clients.add(ws);
+  console.log(`[EVENT] New client connected! Total clients: ${clients.size}`);
 
   ws.on('message', function message(data) {
     const msg = data.toString();
+    console.log(`[RAW MESSAGE] Received: ${msg}`);
+    fs.writeFileSync('latest_msg.txt', msg + '\n', { flag: 'a' });
     
     // If the message is a JSON payload from the Hardware (ESP8266)
     try {
       const parsed = JSON.parse(msg);
       if (parsed.type === "sensor_reading") {
         // We received real hardware data! Add the Device ID to match the React app expectations
-        const hardwareDeviceId = "AURA-X792";
+        const hardwareDeviceId = "VERTEX-X792";
         const relayPayload = {
           type: "sensor_reading",
           deviceId: hardwareDeviceId,

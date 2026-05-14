@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, handlePairDevice }) {
+export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, handlePairDevice, relayUrl, setRelayUrl }) {
   const [inputId, setInputId] = useState(pairedDeviceId);
+  const [inputUrl, setInputUrl] = useState(relayUrl || "ws://localhost:8080");
 
   return (
     <div className="card" style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "30px 40px" }}>
@@ -52,7 +53,7 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <input 
               type="text" 
-              placeholder="e.g. AURA-X792"
+              placeholder="e.g. VERTEX-X792"
               value={inputId}
               onChange={(e) => setInputId(e.target.value)}
               style={{ 
@@ -78,6 +79,38 @@ export function DeviceManager({ hardwareMode, setHardwareMode, pairedDeviceId, h
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-healthy)" }}></span> Paired
               </span>
             )}
+          </div>
+        </div>
+
+        <div style={{ height: 40, width: 1, background: "var(--border-color)" }}></div>
+
+        {/* Relay URL */}
+        <div>
+          <div className="card-label" style={{ fontSize: "13px" }}>Relay Bridge URL</div>
+          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+            <input 
+              type="text" 
+              placeholder="ws://localhost:8080"
+              value={inputUrl}
+              onChange={(e) => setInputUrl(e.target.value)}
+              style={{ 
+                background: "var(--bg-muted)", color: "var(--text-primary)", 
+                border: "1px solid var(--border-color)", padding: "10px 14px", 
+                borderRadius: "8px", fontSize: "15px", width: "160px" 
+              }}
+            />
+            <button 
+              onClick={() => setRelayUrl(inputUrl)}
+              disabled={inputUrl === relayUrl}
+              style={{ 
+                background: inputUrl === relayUrl ? "var(--bg-muted)" : "var(--color-blue)", 
+                color: inputUrl === relayUrl ? "var(--text-secondary)" : "white", 
+                border: "none", padding: "10px 20px", 
+                borderRadius: "8px", fontSize: "14px", fontWeight: 600, 
+                cursor: inputUrl === relayUrl ? "not-allowed" : "pointer", transition: "0.2s" 
+              }}>
+              Update
+            </button>
           </div>
         </div>
 

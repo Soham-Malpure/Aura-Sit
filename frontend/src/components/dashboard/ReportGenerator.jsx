@@ -17,7 +17,7 @@ export default function ReportGenerator({ sessionDate = null }) {
       const image = canvas.toDataURL('image/png');
       
       const dateStr = new Date(sessionDate || Date.now()).toISOString().split('T')[0];
-      const filename = `aura-sit-report-${dateStr}.png`;
+      const filename = `vertex-report-${dateStr}.png`;
       
       const link = document.createElement('a');
       link.href = image;

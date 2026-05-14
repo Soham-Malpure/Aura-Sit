@@ -39,15 +39,15 @@ export default function PairingScreen() {
     setIconClass("searching");
 
     // Randomize success/failure based on the input just for pure realism demo
-    // If they type "AURA-X792" it works, otherwise random success/fail.
+    // If they type "VERTEX-X792" it works, otherwise random success/fail.
     let willSucceed = Math.random() > 0.4;
-    if (devId === "AURA-X792") willSucceed = true; 
+    if (devId === "VERTEX-X792") willSucceed = true; 
 
     setTimeout(() => {
       setIconClass(willSucceed ? "connected" : "failed");
       setPairingState(willSucceed ? "success" : "failed");
       if (willSucceed) {
-        localStorage.setItem("aura_device_id", devId);
+        localStorage.setItem("vertex_device_id", devId);
       }
     }, 3000); // 3 second fake loading delay
   };
@@ -68,7 +68,7 @@ export default function PairingScreen() {
           <Cpu size={32} />
         </div>
 
-        <h2>Pair Aura-Sit Sensor</h2>
+        <h2>Pair VerteX Sensor</h2>
         <p>Wirelessly connect your posture tracking node to the dashboard environment.</p>
 
         {/* Initial Input State */}
@@ -79,7 +79,7 @@ export default function PairingScreen() {
               type="text"
               id="deviceId"
               className="pairing-input"
-              placeholder="e.g., AURA-X792"
+              placeholder="e.g., VERTEX-X792"
               autoComplete="off"
               spellCheck="false"
               maxLength={12}

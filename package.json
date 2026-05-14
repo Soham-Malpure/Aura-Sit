@@ -1,5 +1,5 @@
 {
-  "name": "aura-sit",
+  "name": "vertex",
   "version": "1.0.0",
   "description": "> A comprehensive, True IoT customized posture-monitoring ecosystem bridging custom hardware with a highly responsive, analytical SaaS dashboard.",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Soham-Malpure/Aura-Sit.git"
+    "url": "git+https://github.com/Soham-Malpure/VerteX.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Soham-Malpure/Aura-Sit/issues"
+    "url": "https://github.com/Soham-Malpure/VerteX/issues"
   },
-  "homepage": "https://github.com/Soham-Malpure/Aura-Sit#readme",
+  "homepage": "https://github.com/Soham-Malpure/VerteX#readme",
   "dependencies": {
     "ws": "^8.20.0"
   }

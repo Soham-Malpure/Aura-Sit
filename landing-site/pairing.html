@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura-Sit – Device Pairing</title>
+    <title>VerteX – Device Pairing</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -265,14 +265,14 @@
             <i data-feather="cpu" style="width: 32px; height: 32px;"></i>
         </div>
 
-        <h2>Pair Aura-Sit Sensor</h2>
+        <h2>Pair VerteX Sensor</h2>
         <p>Wirelessly connect your posture tracking node to the dashboard environment.</p>
 
         <!-- Initial Input State -->
         <div id="stateInput" class="state-layer active">
             <div class="input-group" style="width: 100%;">
                 <label for="deviceId">Device Signature</label>
-                <input type="text" id="deviceId" placeholder="e.g., AURA-X792" autocomplete="off" spellcheck="false" maxlength="12">
+                <input type="text" id="deviceId" placeholder="e.g., VERTEX-X792" autocomplete="off" spellcheck="false" maxlength="12">
             </div>
             <button id="connectBtn">
                 Connect Device
@@ -312,7 +312,7 @@
         const deviceInput = document.getElementById('deviceId');
         const connectBtn = document.getElementById('connectBtn');
 
-        // Input formatter (auto formats to uppercase and masks AURA prefixes nicely)
+        // Input formatter (auto formats to uppercase and masks VERTEX prefixes nicely)
         deviceInput.addEventListener('input', function(e) {
             this.value = this.value.toUpperCase();
         });
@@ -341,9 +341,9 @@
             hardwareIcon.classList.remove('failed', 'connected');
             
             // Randomize success/failure based on the input just for pure realism demo
-            // If they type "AURA-X792" it works, otherwise random success/fail.
+            // If they type "VERTEX-X792" it works, otherwise random success/fail.
             let willSucceed = Math.random() > 0.4; 
-            if (devId === 'AURA-X792') willSucceed = true; // Guaranteed success for standard mock id
+            if (devId === 'VERTEX-X792') willSucceed = true; // Guaranteed success for standard mock id
 
             setTimeout(() => {
                 hardwareIcon.classList.remove('searching');

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { classifyPosture, getBodyPart, MAX_HISTORY, evaluate, calibrate, isCalibrated } from "../utils/posture";
 
-export function usePostureEngine(hardwareMode = "simulation") {
+export function usePostureEngine(hardwareMode = "simulation", relayUrl = "ws://localhost:8080") {
   const socketRef = useRef(null);
   const [chestDist, setChestDist] = useState(55);
   const [faceDist, setFaceDist] = useState(52);
@@ -21,7 +21,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
   const [sessionTotals, setSessionTotals] = useState({ healthy: 0, warning: 0, danger: 0 });
   const [history, setHistory] = useState([]);
   const [insights, setInsights] = useState([]);
-  const [pairedDeviceId, setPairedDeviceId] = useState(() => localStorage.getItem("aura_device_id") || "");
+  const [pairedDeviceId, setPairedDeviceId] = useState(() => localStorage.getItem("vertex_device_id") || "");
   const [activeShifts, setActiveShifts] = useState(0);
   const [ttfMinutes, setTtfMinutes] = useState(null);
   const [isTracking, setIsTracking] = useState(false);
@@ -48,7 +48,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
 
   const handlePairDevice = (id) => {
     setPairedDeviceId(id);
-    localStorage.setItem("aura_device_id", id);
+    localStorage.setItem("vertex_device_id", id);
   };
 
   const pairedDeviceIdRef = useRef(pairedDeviceId);
@@ -107,6 +107,26 @@ export function usePostureEngine(hardwareMode = "simulation") {
     // Currently stubbed out waiting for real socket connections.
   };
 
+  const generateInsights = (nextHistory) => {
+    const recent = nextHistory.slice(-6);
+    const badCount = recent.filter(h => h.state !== "healthy").length;
+    const trend = nextHistory.slice(-3).map(h => h.chest);
+    const declining = trend.every((v, i) => i === 0 || v < trend[i - 1]);
+
+    const newInsights = [];
+    if (badCount >= 4) newInsights.push({ type: "warn", text: "Frequent forward head posture in last 18s" });
+    if (declining) newInsights.push({ type: "danger", text: "Posture worsening rapidly — take a break" });
+    const avgChest = nextHistory.reduce((s, h) => s + h.chest, 0) / nextHistory.length;
+    if (avgChest < 47) newInsights.push({ type: "warn", text: "Session avg safely below threshold (50 cm)" });
+    if (nextHistory.length > 10) {
+      const firstHalf = nextHistory.slice(0, 5).reduce((s, h) => s + h.chest, 0) / 5;
+      const secondHalf = nextHistory.slice(-5).reduce((s, h) => s + h.chest, 0) / 5;
+      if (secondHalf < firstHalf - 3) newInsights.push({ type: "info", text: "Posture degrades after prolonged sitting window" });
+      if (secondHalf > firstHalf + 2) newInsights.push({ type: "ok", text: "Posture organically improved — good adjustment!" });
+    }
+    setInsights(newInsights.slice(0, 3));
+  };
+
   useEffect(() => {
     let socket;
     
@@ -116,7 +136,13 @@ export function usePostureEngine(hardwareMode = "simulation") {
         // If deployed to a real website (vercel/netlify web), window.location.hostname is the cloud domain.
         // To avoid an immediate Mixed Content crash (ws:// on https://), we wrap it in a try-catch.
         // We connect back to localhost since the Node server is running on the local machine.
-        socket = new WebSocket("ws://localhost:8080");
+        // Users can now specify wss:// tunnels (like ngrok) to bypass mixed content blocks on live sites.
+        let connectionUrl = relayUrl || "ws://localhost:8080";
+        // Attempt to upgrade to wss if on https and connecting to a cloud relay
+        if (window.location.protocol === "https:" && connectionUrl.startsWith("ws://") && !connectionUrl.includes("localhost") && !connectionUrl.includes("127.0.0.1")) {
+           connectionUrl = connectionUrl.replace("ws://", "wss://");
+        }
+        socket = new WebSocket(connectionUrl);
         socketRef.current = socket;
         
         socket.onopen = () => {
@@ -128,7 +154,8 @@ export function usePostureEngine(hardwareMode = "simulation") {
           const data = JSON.parse(event.data);
           if (data.type === "sensor_reading") {
             // Security: Enforce Device ID matching using Ref to avoid stale closures
-            if (data.deviceId !== pairedDeviceIdRef.current) {
+            // Allow data to flow if no device is explicitly paired yet
+            if (pairedDeviceIdRef.current && data.deviceId !== pairedDeviceIdRef.current) {
               console.warn(`[Security] Ignored data. Expected: ${pairedDeviceIdRef.current}, but saw: ${data.deviceId}`);
               return;
             }
@@ -157,6 +184,7 @@ export function usePostureEngine(hardwareMode = "simulation") {
                   face: data.face,
                   state: result.state
                 }].slice(-MAX_HISTORY);
+                generateInsights(next);
                 return next;
               });
             }
@@ -206,29 +234,13 @@ export function usePostureEngine(hardwareMode = "simulation") {
           }].slice(-MAX_HISTORY);
 
           // Insight detection
-          const recent = next.slice(-6);
-          const badCount = recent.filter(h => h.state !== "healthy").length;
-          const trend = next.slice(-3).map(h => h.chest);
-          const declining = trend.every((v, i) => i === 0 || v < trend[i - 1]);
-
-          const newInsights = [];
-          if (badCount >= 4) newInsights.push({ type: "warn", text: "Frequent forward head posture in last 18s" });
-          if (declining) newInsights.push({ type: "danger", text: "Posture worsening rapidly — take a break" });
-          const avgChest = next.reduce((s, h) => s + h.chest, 0) / next.length;
-          if (avgChest < 47) newInsights.push({ type: "warn", text: "Session avg safely below threshold (50 cm)" });
-          if (next.length > 10) {
-            const firstHalf = next.slice(0, 5).reduce((s, h) => s + h.chest, 0) / 5;
-            const secondHalf = next.slice(-5).reduce((s, h) => s + h.chest, 0) / 5;
-            if (secondHalf < firstHalf - 3) newInsights.push({ type: "info", text: "Posture degrades after prolonged sitting window" });
-            if (secondHalf > firstHalf + 2) newInsights.push({ type: "ok", text: "Posture organically improved — good adjustment!" });
-          }
-          setInsights(newInsights.slice(0, 3));
+          generateInsights(next);
           return next;
         });
       }
     }, 3000);
     return () => clearInterval(interval);
-  }, [hardwareMode]);
+  }, [hardwareMode, relayUrl]);
 
   const pqs = totalSecs > 0 ? Math.round(100 - (badSecs / totalSecs) * 100) : 100;
   const badPct = totalSecs > 0 ? Math.round((badSecs / totalSecs) * 100) : 0;

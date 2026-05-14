@@ -1,7 +1,7 @@
 # 🌅 Next Session: Cloud Database Integration
 
 **Context from last session:**
-The Aura-Sit project was successfully deployed to the cloud! We deployed the Node.js backend to **Render**, the React frontend to **Vercel**, and proved the IoT architecture works wirelessly anywhere.
+The VerteX project was successfully deployed to the cloud! We deployed the Node.js backend to **Render**, the React frontend to **Vercel**, and proved the IoT architecture works wirelessly anywhere.
 
 However, we noticed that when hitting "Save Session", the history does not sync between your laptop and your phone. This is because we are currently using browser `localStorage` (which is isolated to individual devices).
 

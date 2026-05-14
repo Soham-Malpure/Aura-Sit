@@ -35,7 +35,7 @@ export async function generateCSVReport(deviceId) {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `aura_sit_lifetime_report_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute("download", `vertex_lifetime_report_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link); // Required for Firefox
   link.click();
   document.body.removeChild(link);
@@ -61,7 +61,7 @@ export async function exportVisualSessionReport() {
     const imgData = canvas.toDataURL("image/png");
     const link = document.createElement("a");
     link.href = imgData;
-    link.download = `AuraSit_Session_Export_${new Date().toISOString().slice(0, 10)}.png`;
+    link.download = `VerteX_Session_Export_${new Date().toISOString().slice(0, 10)}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

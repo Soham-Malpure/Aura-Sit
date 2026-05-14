@@ -1,7 +1,7 @@
 {
-  "name": "aura-backend",
+  "name": "vertex-backend",
   "version": "1.0.0",
-  "description": "Virtual IoT NodeMCU Simulator for Aura-Sit",
+  "description": "Virtual IoT NodeMCU Simulator for VerteX",
   "main": "virtual-device.js",
   "type": "module",
   "scripts": {

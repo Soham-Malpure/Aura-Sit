@@ -34,7 +34,7 @@ export function SessionReportTemplate({ metrics, history, dateString, isVisible 
         {/* Header */}
         <div style={{ marginBottom: 30, display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-color)", paddingBottom: 20 }}>
            <div>
-             <h1 style={{ margin: 0, fontSize: 24, letterSpacing: "-0.5px" }}>Aura-Sit Analysis Report</h1>
+             <h1 style={{ margin: 0, fontSize: 24, letterSpacing: "-0.5px" }}>VerteX Analysis Report</h1>
              <div style={{ color: "var(--text-secondary)", fontSize: 13, marginTop: 4 }}>Date: {dateString}</div>
            </div>
            
@@ -42,7 +42,7 @@ export function SessionReportTemplate({ metrics, history, dateString, isVisible 
              background: "var(--color-blue)", borderRadius: 10, width: 44, height: 44,
              display: "flex", alignItems: "center", justifyContent: "center",
              fontSize: 16, fontWeight: "bold", color: "white"
-           }}>AS</div>
+           }}>VX</div>
         </div>
 
         {/* Merged New Analytics (PQS, Stretch, Breakdown) */}

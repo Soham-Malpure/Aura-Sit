@@ -20,9 +20,9 @@ export function Header({ postureState, totalMin, activeTab, setActiveTab, onExpo
             background: "var(--color-blue)", borderRadius: 10, width: 34, height: 34,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 14, fontWeight: "bold", color: "white"
-          }}>AS</div>
+          }}>VX</div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 17, color: "var(--text-primary)", letterSpacing: "-0.3px" }}>Aura-Sit</div>
+            <div style={{ fontWeight: 700, fontSize: 17, color: "var(--text-primary)", letterSpacing: "-0.3px" }}>VerteX</div>
             <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>IoT Posture Monitor</div>
           </div>
         </div>

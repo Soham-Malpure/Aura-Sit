@@ -94,7 +94,7 @@ export default function LandingPage() {
         <div className="landing-container header-container">
           <div className="landing-logo">
             <div className="logo-icon"></div>
-            <span>Aura-Sit</span>
+            <span>VerteX</span>
           </div>
           <nav className="landing-nav">
             <a href="#features">Features</a>
@@ -113,7 +113,7 @@ export default function LandingPage() {
             Fix Your Posture.<br />Effortlessly.
           </h1>
           <p className="hero-subtitle pop-in delay-1">
-            Aura-Sit uses real-time sensing and intelligent feedback to improve your sitting habits without the hassle of wearables or cameras.
+            VerteX uses real-time sensing and intelligent feedback to improve your sitting habits without the hassle of wearables or cameras.
           </p>
           <div className="hero-ctas pop-in delay-2">
             <button onClick={() => navigate("/login")} className="landing-btn btn-primary">
@@ -200,7 +200,7 @@ export default function LandingPage() {
         <div className="landing-container">
           <div className="footer-content">
             <div className="footer-brand">
-              <h2>Aura-Sit</h2>
+              <h2>VerteX</h2>
             </div>
             <div className="footer-credits">
               <p>Built by Soham Malpure</p><br />

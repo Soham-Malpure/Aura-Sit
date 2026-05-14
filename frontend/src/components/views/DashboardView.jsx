@@ -20,6 +20,7 @@ import "../../index.css";
 export default function DashboardView() {
   const [activeTab, setActiveTab] = useState("live");
   const [hardwareMode, setHardwareMode] = useState("simulation"); // 'simulation' vs 'live'
+  const [relayUrl, setRelayUrl] = useState("ws://localhost:8080");
 
   const {
     chestDist, faceDist, postureState, totalMin, badMin, totalSecs, badSecs,
@@ -27,7 +28,7 @@ export default function DashboardView() {
     pairedDeviceId, handlePairDevice, activeShifts, ttfMinutes,
     isTracking, startTracking, endSession,
     spineState, neckState, neckAngle, postureScore, sessionTotals, currentStretch, baseline, handleCalibrate
-  } = usePostureEngine(hardwareMode);
+  } = usePostureEngine(hardwareMode, relayUrl);
 
   const [finalReportData, setFinalReportData] = useState(null);
 
@@ -120,6 +121,8 @@ export default function DashboardView() {
               setHardwareMode={setHardwareMode}
               pairedDeviceId={pairedDeviceId}
               handlePairDevice={handlePairDevice}
+              relayUrl={relayUrl}
+              setRelayUrl={setRelayUrl}
             />
 
             <div style={{ marginBottom: 16, display: "flex", gap: 16, alignItems: "stretch" }}>
@@ -220,7 +223,7 @@ export default function DashboardView() {
 
         {/* Footer */}
         <div style={{ marginTop: 30, textAlign: "center", fontSize: 11, color: "var(--text-secondary)" }}>
-          Aura-Sit — IoT Posture Monitoring System · &copy; Soham Malpure
+          VerteX — IoT Posture Monitoring System · &copy; Soham Malpure
         </div>
 
       </div>
