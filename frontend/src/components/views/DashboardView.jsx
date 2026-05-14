@@ -20,7 +20,7 @@ import "../../index.css";
 export default function DashboardView() {
   const [activeTab, setActiveTab] = useState("live");
   const [hardwareMode, setHardwareMode] = useState("simulation"); // 'simulation' vs 'live'
-  const [relayUrl, setRelayUrl] = useState("ws://localhost:8080");
+  const [relayUrl, setRelayUrl] = useState("wss://vertex-backend-rzdy.onrender.com");
 
   const {
     chestDist, faceDist, postureState, totalMin, badMin, totalSecs, badSecs,
@@ -133,9 +133,9 @@ export default function DashboardView() {
               </div>
               {!isTracking && (
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <CalibrationButton 
-                    latestChest={chestDist} 
-                    latestFace={faceDist} 
+                  <CalibrationButton
+                    latestChest={chestDist}
+                    latestFace={faceDist}
                     onCalibrate={handleCalibrate}
                   />
                 </div>
